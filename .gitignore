@@ -3,3 +3,7 @@
 ################################################################################
 
 /Yandex.Dj/ClientApp
+/Yandex.Dj.Console/bin/Debug/netcoreapp2.2
+/Yandex.Dj.Console/obj
+/Yandex.Dj.sln.DotSettings.user
+/.vs
