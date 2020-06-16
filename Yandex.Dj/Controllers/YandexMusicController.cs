@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
+using Newtonsoft.Json.Linq;
+
 using Yandex.Dj.Services;
 using Yandex.Music.Api.Common.YPlaylist;
 using Yandex.Music.Api.Common.YTrack;
@@ -38,16 +40,18 @@ namespace Yandex.Dj.Controllers
 
         private string GetCover(string url, int size)
         {
-            return $"http://{url.Replace("%%", $"{size}x{size}")}";
+            return string.IsNullOrEmpty(url) 
+                ? string.Empty
+                : $"http://{url.Replace("%%", $"{size}x{size}")}";
         }
 
-        private object GetTrack(YTrackContainer track)
+        private object GetTrack(YTrack track)
         {
             return new Dictionary<string, object> {
-                { "name", track.Track.Title },
-                { "singer", track.Track.Artists.First().Name },
-                { "cover", GetCover(track.Track.CoverUri, 100) },
-                { "key", track.Track.GetKey().ToString() }
+                { "name", track.Title },
+                { "singer", track.Artists.Count > 0 ? track.Artists.First().Name : string.Empty },
+                { "cover", GetCover(track.CoverUri, 100) },
+                { "key", track.GetKey().ToString() }
             };
         }
 
@@ -67,8 +71,8 @@ namespace Yandex.Dj.Controllers
             return testUser.Playlists
                 .Select(p => new Dictionary<string, object> {
                     { "title", p.Title },
-                    { "cover", GetCover(p.Cover.Url, 100) },
-                    { "tracks", p.Tracks.Select(t => GetTrack(t)) }
+                    { "cover", GetCover(p.OgImage, 100) },
+                    { "tracks", p.Tracks.Select(t => GetTrack(t.Track)) }
                 });
         }
 
@@ -82,6 +86,12 @@ namespace Yandex.Dj.Controllers
         public object Track(string user, string key)
         {
             return music.GetMusicLink(testUser, key);
+        }
+
+        [HttpPost("currentSong")]
+        public void UpdateCurrentSong(string user, [FromBody]JObject data)
+        {
+            testUser.UpdateCurrentSong(data["name"].ToString());
         }
 
         public YandexMusicController(YandexMusicService yandexMusic)

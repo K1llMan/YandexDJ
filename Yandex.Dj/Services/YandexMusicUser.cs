@@ -12,7 +12,25 @@ namespace Yandex.Dj.Services
 
         #endregion Поля
 
+        #region События
+
+        // Событие записи в лог
+        public class UpdateCurrentSongEventArgs
+        {
+            public string Name { get; internal set; }
+        }
+
+        public delegate void UpdateCurrentSongHandler(UpdateCurrentSongEventArgs e);
+        public event UpdateCurrentSongHandler UpdateCurrentSongEvent;
+
+        #endregion События
+
         #region Свойства
+
+        /// <summary>
+        /// Текущая проигрываемая композиция
+        /// </summary>
+        public string CurrentSong { get; private set; }
 
         /// <summary>
         /// Текущий плейлист
@@ -32,6 +50,15 @@ namespace Yandex.Dj.Services
         #endregion Свойства
 
         #region Основные функции
+
+        public void UpdateCurrentSong(string song)
+        {
+            CurrentSong = song;
+
+            UpdateCurrentSongEvent?.Invoke(new UpdateCurrentSongEventArgs {
+                Name = song
+            });
+        }
 
         public YandexMusicUser()
         {

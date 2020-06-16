@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Yandex.Dj.Services;
+using Yandex.Dj.Services.SocketHandler;
 
 namespace Yandex.Dj
 {
@@ -38,13 +39,13 @@ namespace Yandex.Dj
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-            }
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            // Использование сокетов
+            app.UseWebSockets();
+            app.UseMiddleware<WebSocketMiddleware>();
 
             app.UseMvc(routes =>
             {
