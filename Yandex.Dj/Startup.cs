@@ -23,7 +23,7 @@ namespace Yandex.Dj
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSingleton(typeof(YandexMusicService));
+            services.AddSingleton(typeof(StreamingService));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

@@ -28,7 +28,7 @@ namespace Yandex.Dj.Services.SocketHandler
             nextDelegate = next;
         }
 
-        public async Task Invoke(HttpContext context, YandexMusicService yandexMusic)
+        public async Task Invoke(HttpContext context, StreamingService streaming)
         {
             if (!pathRegex.IsMatch(context.Request.Path))
             {
@@ -46,7 +46,7 @@ namespace Yandex.Dj.Services.SocketHandler
             WebSocketWrapper socket = new WebSocketWrapper(webSocket);
 
             // Подписка на событие смены трека
-            yandexMusic.Users["k1llman"].UpdateCurrentSongEvent += eventArgs =>
+            streaming.UpdateCurrentSongEvent += eventArgs =>
             {
                 Dictionary<string, object> data = new Dictionary<string, object> {
                     { "event", "updateSong" },

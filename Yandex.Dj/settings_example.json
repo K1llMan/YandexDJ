@@ -1,5 +1,9 @@
 {
-    "login": "",
-    "password": "",
-    "token": ""
+	"providers": {
+        "yandex": {
+	        "login": "",
+	        "password": "",
+	        "token": ""
+        }
+	}
 }
