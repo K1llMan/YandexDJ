@@ -7,23 +7,23 @@
         /// <summary>
         /// Идентификатор
         /// </summary>
-        public string ID;
+        public string ID { get; set; }
         /// <summary>
         /// Тип провайдера
         /// </summary>
-        public ProviderType Type;
+        public ProviderType Type { get; set; }
         /// <summary>
         /// Обложка
         /// </summary>
-        public string Cover;
+        public string Cover { get; set; }
         /// <summary>
         /// Название
         /// </summary>
-        public string Title;
+        public string Title { get; set; }
         /// <summary>
         /// Список треков в плейлисте
         /// </summary>
-        public Track[] Tracks;
+        public Track[] Tracks { get; set; }
 
         #endregion Свойства
     }

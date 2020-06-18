@@ -1,7 +1,12 @@
+using System.IO;
+using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using Yandex.Dj.Extensions;
 using Yandex.Dj.Services;
 using Yandex.Dj.Services.ContentProviders.Common;
 
@@ -32,6 +37,16 @@ namespace Yandex.Dj.Controllers
 
         #region Вспомогательные функции
 
+        private JObject GetBodyObject()
+        {
+            string data;
+            using (StreamReader sr = new StreamReader(Request.Body)) {
+                data = sr.ReadToEndAsync().Result;
+            }
+
+            return JObject.Parse(data);
+        }
+
         #endregion Вспомогательные функции
 
         #region Основные функции
@@ -61,8 +76,12 @@ namespace Yandex.Dj.Controllers
         }
 
         [HttpPost("currentSong")]
-        public void UpdateCurrentSong(string user, [FromBody]JObject data)
+        public void UpdateCurrentSong(string user)
         {
+            JObject data = GetBodyObject();
+            if (data.IsNullOrEmpty())
+                return;
+
             streamingService.UpdateCurrentSong(data["name"].ToString());
         }
 
