@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 using Newtonsoft.Json.Linq;
 
@@ -9,6 +11,7 @@ namespace Yandex.Dj.Services.ContentProviders.Common
         #region Поля
 
         protected List<PlaylistInfo> playlists;
+        protected DirectoryInfo appDir;
 
         #endregion Поля
 
@@ -27,6 +30,11 @@ namespace Yandex.Dj.Services.ContentProviders.Common
         #endregion Свойства
 
         #region Перегружаемые функции
+
+        public virtual void UpdatePlaylists()
+        {
+
+        }
 
         /// <summary>
         /// Получить список доступных плейлистов без треков
@@ -62,6 +70,7 @@ namespace Yandex.Dj.Services.ContentProviders.Common
             Config = config;
 
             playlists = new List<PlaylistInfo>();
+            appDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
         }
 
         #endregion Основные функция

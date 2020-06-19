@@ -63,6 +63,12 @@ namespace Yandex.Dj.Controllers
             return streamingService.GetPlaylists();
         }
 
+        [HttpGet("playlists/update")]
+        public void UpdatePlaylists(ProviderType type)
+        {
+            streamingService.UpdatePlaylists(type);
+        }
+
         [HttpGet("playlist")]
         public object Playlist(string user, ProviderType type, string id)
         {

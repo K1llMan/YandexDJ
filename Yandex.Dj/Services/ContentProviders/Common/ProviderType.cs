@@ -6,16 +6,16 @@
     public enum ProviderType
     {
         /// <summary>
+        /// Неизвестный
+        /// </summary>
+        Unknown,
+        /// <summary>
         /// Яндекс.Музыка
         /// </summary>
         Yandex,
         /// <summary>
         /// Локальные файлы
         /// </summary>
-        Local,
-        /// <summary>
-        /// Неизвестный
-        /// </summary>
-        Unknown
+        Local
     }
 }

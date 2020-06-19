@@ -4,6 +4,9 @@
 	        "login": "",
 	        "password": "",
 	        "token": ""
-        }
+        },
+		"local": {
+			"path": "playlists"
+		}
 	}
 }

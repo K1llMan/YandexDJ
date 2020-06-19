@@ -31,4 +31,18 @@
     <Folder Include="Extensions\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="test_data\**\*.*">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <TestData Include="test_data\**" />
+  </ItemGroup>
+
+  <Target Name="CopyFiles" AfterTargets="AfterBuild">
+      <Copy SourceFiles="@(TestData)" DestinationFolder="$(OutputPath)\%(RecursiveDir)" />
+  </Target>
+
 </Project>

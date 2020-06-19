@@ -43,18 +43,7 @@ namespace Yandex.Dj.Services.SocketHandler
             }
 
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-            WebSocketWrapper socket = new WebSocketWrapper(webSocket);
-
-            // Подписка на событие смены трека
-            streaming.UpdateCurrentSongEvent += eventArgs =>
-            {
-                Dictionary<string, object> data = new Dictionary<string, object> {
-                    { "event", "updateSong" },
-                    { "data", eventArgs.Name }
-                };
-
-                socket.Send(JsonConvert.SerializeObject(data));
-            };
+            WebSocketWrapper socket = streaming.Broadcast.Add(webSocket);
 
             try
             {

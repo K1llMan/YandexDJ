@@ -30,7 +30,7 @@ namespace Yandex.Dj.Services.SocketHandler
             public string Data { get; internal set; }
         }
 
-        public delegate void RecieveEventHandler(object sender, ReceiveEventArgs e);
+        public delegate void RecieveEventHandler(WebSocketWrapper sender, ReceiveEventArgs e);
         public event RecieveEventHandler OnReceive;
 
         // Событие закрытия соединения

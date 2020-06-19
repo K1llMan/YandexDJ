@@ -1,0 +1,18 @@
+﻿{
+	"cover": "e:\\Media\\Pictures\\1.jpg",
+	"title": "Test playlist",
+	"tracks": [
+		{
+			"cover": "e:\\Media\\Pictures\\1.jpg",
+			"artist": "Выше крыши",
+			"title": "Небо",
+			"path": "e:\\Media\\Music\\Different\\Выше крыши - Небо.mp3"
+		},
+		{
+			"cover": "e:\\Media\\Pictures\\1.jpg",
+			"artist": "Выше крыши",
+			"title": "Встреча",
+			"path": "e:\\Media\\Music\\Different\\Выше крыши - Встреча.mp3"
+		}
+	]
+}

@@ -41,6 +41,8 @@ namespace Yandex.Dj.Services.ContentProviders
 
         private void CachePlaylists()
         {
+            playlists = new List<PlaylistInfo>();
+
             // Кэширование плейлистов
             api.PlaylistAPI.Favorites(storage)
                 .ForEach(p => {
@@ -67,6 +69,11 @@ namespace Yandex.Dj.Services.ContentProviders
         #endregion Вспомогательные функции
 
         #region Перегружаемые функции
+
+        public override void UpdatePlaylists()
+        {
+            CachePlaylists();
+        }
 
         public override Playlist GetPlaylist(string id)
         {
