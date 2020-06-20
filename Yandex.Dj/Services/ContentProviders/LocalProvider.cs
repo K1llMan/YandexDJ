@@ -18,8 +18,6 @@ namespace Yandex.Dj.Services.ContentProviders
 
         public class LocalTrack
         {
-            #region Свойства
-
             /// <summary>
             /// Идентификатор
             /// </summary>
@@ -41,7 +39,10 @@ namespace Yandex.Dj.Services.ContentProviders
             /// </summary>
             public string Path { get; set; }
 
-            #endregion Свойства
+            /// <summary>
+            /// Усиление
+            /// </summary>
+            public double Gain { get; set; } = 12;
         }
 
         private class LocalPlaylist
@@ -133,7 +134,8 @@ namespace Yandex.Dj.Services.ContentProviders
                     ID = t.ID,
                     Artist = t.Artist,
                     Title = t.Title,
-                    Cover = $"api/content/trackCover?id={t.ID}"
+                    Cover = $"api/content/trackCover?id={t.ID}",
+                    Gain = t.Gain
                 }).ToArray()
             };
         }

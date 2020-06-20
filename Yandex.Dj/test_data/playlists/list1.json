@@ -6,13 +6,15 @@
 			"cover": "e:\\Media\\Pictures\\1.jpg",
 			"artist": "Выше крыши",
 			"title": "Небо",
-			"path": "e:\\Media\\Music\\Different\\Выше крыши - Небо.mp3"
+			"path": "e:\\Media\\Music\\Different\\Выше крыши - Небо.mp3",
+			"gain": -10
 		},
 		{
 			"cover": "e:\\Media\\Pictures\\1.jpg",
 			"artist": "Выше крыши",
 			"title": "Встреча",
-			"path": "e:\\Media\\Music\\Different\\Выше крыши - Встреча.mp3"
+			"path": "e:\\Media\\Music\\Different\\Выше крыши - Встреча.mp3",
+			"gain": -10
 		}
 	]
 }

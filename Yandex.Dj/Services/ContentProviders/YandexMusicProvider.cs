@@ -91,7 +91,8 @@ namespace Yandex.Dj.Services.ContentProviders
                     ID = t.Track.GetKey().ToString(),
                     Artist = t.Track.Artists.Count > 0 ? t.Track.Artists.First().Name : string.Empty,
                     Title = t.Track.Title,
-                    Cover = GetCover(t.Track.CoverUri, 100)
+                    Cover = GetCover(t.Track.CoverUri, 100),
+                    Gain = t.Track.Normalization.Gain
                 })
                 .ToArray()
             };

@@ -24,6 +24,10 @@
         /// Название
         /// </summary>
         public string Title { get; set; }
+        /// <summary>
+        /// Усиление
+        /// </summary>
+        public double Gain { get; set; } = 12;
 
         #endregion Свойства
     }
