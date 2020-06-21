@@ -51,6 +51,12 @@ namespace Yandex.Dj.Controllers
             return File(streamingService.GetTrackContent(id), "audio/mpeg");
         }
 
+        [HttpGet("speech")]
+        public object Speech(string id)
+        {
+            return File(streamingService.Twitch.Bot.GetSpeechFile(id), "audio/wav");
+        }
+
         public ContentController(StreamingService streaming)
         {
             streamingService = streaming;

@@ -1,4 +1,9 @@
 {
+	"twitch": {
+		"login": "",
+		"token": "",
+		"channel": ""
+	},
 	"providers": {
         "yandex": {
 	        "login": "",

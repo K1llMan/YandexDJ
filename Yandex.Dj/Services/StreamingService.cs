@@ -10,6 +10,7 @@ using Newtonsoft.Json.Serialization;
 using Yandex.Dj.Extensions;
 using Yandex.Dj.Services.ContentProviders;
 using Yandex.Dj.Services.ContentProviders.Common;
+using Yandex.Dj.Services.Twitch;
 
 namespace Yandex.Dj.Services
 {
@@ -33,11 +34,16 @@ namespace Yandex.Dj.Services
         /// </summary>
         public Broadcast Broadcast { get; private set; }
 
+        /// <summary>
+        /// Управление Twitch
+        /// </summary>
+        public TwitchConnector Twitch { get; private set; }
+
         #endregion Свойства
 
         #region События
 
-        // Событие записи в лог
+        // Событие обновления трека
         public class UpdateCurrentTrackEventArgs
         {
             public string Name { get; internal set; }
@@ -50,11 +56,8 @@ namespace Yandex.Dj.Services
 
         #region Вспомогательные функции
 
-        private void InitProviders()
+        private void InitProviders(JObject providers)
         {
-            JObject settings = JsonCommon.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json"));
-
-            JObject providers = (JObject)settings["providers"];
             if (!providers.IsNullOrEmpty())
                 foreach (JProperty provider in providers.Properties()) {
                     switch (Enum.Parse<ProviderType>(provider.Name, true)) {
@@ -164,6 +167,13 @@ namespace Yandex.Dj.Services
                 });
             };
 
+            Twitch.Bot.TextToSpeechEventEvent += eventArgs => {
+                Broadcast.Send(new BroadcastEvent {
+                    Event = "speech",
+                    Data = eventArgs.FileName
+                });
+            };
+
             Func<object, string> serializeMessage = o => JsonConvert.SerializeObject(o, Formatting.None,
                 new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
 
@@ -179,10 +189,14 @@ namespace Yandex.Dj.Services
 
         public StreamingService()
         {
+            // Настройки приложения
+            JObject settings = JsonCommon.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json"));
+
             contentProviders = new List<ContentProvider>();
             Broadcast = new Broadcast();
+            Twitch = new TwitchConnector((JObject)settings["twitch"]);
 
-            InitProviders();
+            InitProviders((JObject)settings["providers"]);
             InitBroadcastHandlers();
         }
 
