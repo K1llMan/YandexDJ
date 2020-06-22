@@ -91,6 +91,16 @@ namespace Yandex.Dj.Controllers
             streamingService.UpdateCurrentSong(data["name"].ToString());
         }
 
+        [HttpPost("chatTest")]
+        public void ChatTest()
+        {
+            JObject data = GetBodyObject();
+            if (data.IsNullOrEmpty())
+                return;
+
+            streamingService.Twitch.Bot.ChatCommandTest(data["message"].ToString());
+        }
+
         public StreamingServiceController(StreamingService streaming)
         {
             streamingService = streaming;

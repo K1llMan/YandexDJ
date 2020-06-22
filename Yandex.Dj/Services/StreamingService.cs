@@ -160,16 +160,23 @@ namespace Yandex.Dj.Services
         private void InitBroadcastHandlers()
         {
             // Подписка на событие смены трека
-            UpdateCurrentSongEvent += eventArgs =>  {
-                Broadcast.Send(new BroadcastEvent {
+            UpdateCurrentSongEvent += async eventArgs =>  {
+                await Broadcast.Send(new BroadcastEvent {
                     Event = "updateSong",
                     Data = eventArgs.Name
                 });
             };
 
-            Twitch.Bot.TextToSpeechEventEvent += eventArgs => {
-                Broadcast.Send(new BroadcastEvent {
+            Twitch.Bot.TextToSpeechEvent += async eventArgs => {
+                await Broadcast.Send(new BroadcastEvent {
                     Event = "speech",
+                    Data = eventArgs.FileName
+                });
+            };
+
+            Twitch.Bot.SoundMessageEvent += async eventArgs => {
+                await Broadcast.Send(new BroadcastEvent {
+                    Event = "sound",
                     Data = eventArgs.FileName
                 });
             };
@@ -177,8 +184,8 @@ namespace Yandex.Dj.Services
             Func<object, string> serializeMessage = o => JsonConvert.SerializeObject(o, Formatting.None,
                 new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
 
-            Broadcast.On("getCurrentSong", (wrapper, o) => {
-                wrapper.Send(serializeMessage(new BroadcastEvent {
+            Broadcast.On("getCurrentSong", async (wrapper, o) => {
+                await wrapper.Send(serializeMessage(new BroadcastEvent {
                     Event = "updateSong",
                     Data = CurrentTrack
                 }));

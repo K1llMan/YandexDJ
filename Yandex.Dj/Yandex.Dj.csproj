@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <Folder Include="Extensions\" />
+    <Folder Include="test_data\bot\sound\" />
   </ItemGroup>
 
   <ItemGroup>

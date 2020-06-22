@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-
-using Microsoft.AspNetCore.Mvc.Formatters;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using TwitchLib.Client.Enums;
 using TwitchLib.Client.Models;
 
 using Yandex.Dj.Extensions;
@@ -25,6 +25,9 @@ namespace Yandex.Dj.Services.Twitch
         private DirectoryInfo speechDirCache;
 
         private List<string> commandList;
+        private Dictionary<string, string> soundCommandList;
+
+        private DateTime lastSound = DateTime.Now;
 
         #endregion Поля
 
@@ -37,9 +40,24 @@ namespace Yandex.Dj.Services.Twitch
         }
 
         public delegate void TextToSpeechHandler(TextToSpeechEventArgs e);
-        public event TextToSpeechHandler TextToSpeechEventEvent;
+        public event TextToSpeechHandler TextToSpeechEvent;
+
+        // Событие голосового сообщения
+        public class SoundMessageEventArgs
+        {
+            public string FileName { get; internal set; }
+        }
+
+        public delegate void SoundMessageHandler(SoundMessageEventArgs e);
+        public event SoundMessageHandler SoundMessageEvent;
 
         #endregion События
+
+        #region Свойства
+
+        public int SoundTimeout { get; private set; }
+
+        #endregion Свойства
 
         #region Вспомогательные функции
 
@@ -53,11 +71,17 @@ namespace Yandex.Dj.Services.Twitch
 
         private void Init()
         {
+            // Загрузка текстовых команд
             commandList = new List<string>();
 
             JObject settings = JsonCommon.Load(Path.Combine(botDir.FullName, "bot.json"));
-            if (!settings.IsNullOrEmpty())
+            if (!settings.IsNullOrEmpty()) {
                 commandList = JsonConvert.DeserializeObject<List<string>>(settings["commands"].ToString());
+                SoundTimeout = Convert.ToInt32(settings["soundTimeout"].ToString());
+            }
+
+            // Загрузка звуковых команд
+            soundCommandList = JsonCommon.Load<Dictionary<string, string>>(Path.Combine(botDir.FullName, "sound.json"));
         }
 
         private string TextToSpeech(string text)
@@ -67,7 +91,7 @@ namespace Yandex.Dj.Services.Twitch
                 speechDirCache.Refresh();
             }
 
-            string fileName = Path.GetRandomFileName();
+            string fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             string path = Path.Combine(speechDirCache.FullName, $"{fileName}.wav");
 
             Process process = new Process {
@@ -91,22 +115,40 @@ namespace Yandex.Dj.Services.Twitch
             string message = chatMessage.Message.Trim();
 
             if (message.StartsWith("!")) {
-                string command = message.GetMatches(@"^!\w+").FirstOrDefault();
+                string command = message.GetMatches(@"^!\w+").First();
                 string data = message.GetMatches(@"(?<=\b[\s]).+").FirstOrDefault();
 
-                if (!commandList.Contains(command))
+                if (!commandList.Contains(command) && !soundCommandList.ContainsKey(command.TrimStart('!')))
                     return false;
 
-                Console.WriteLine($"Сообщение \"{message}\" обработано!");
+                switch (command) {
+                    case "!привет":
+                        Send($"Привет, {chatMessage.DisplayName}!");
+                        break;
+                    case "!озвучить":
+                        if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
+                            return true;
 
-                if (command == "!привет") 
-                    Send($"Привет, {chatMessage.DisplayName}!");
+                        string id = TextToSpeech(data);
+                        TextToSpeechEvent?.Invoke(new TextToSpeechEventArgs {
+                            FileName = id
+                        });
 
-                if (command == "!озвучить") {
-                    string id = TextToSpeech(data);
-                    TextToSpeechEventEvent?.Invoke(new TextToSpeechEventArgs {
-                        FileName = id
-                    });
+                        lastSound = DateTime.Now;
+                        break;
+                    default:
+                        if (soundCommandList.ContainsKey(command.TrimStart('!'))) {
+                            if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
+                                return true;
+
+                            SoundMessageEvent?.Invoke(new SoundMessageEventArgs {
+                                FileName = command.TrimStart('!')
+                            });
+
+                            lastSound = DateTime.Now;
+                            break;
+                        }
+                        break;
                 }
 
                 return true;
@@ -126,6 +168,23 @@ namespace Yandex.Dj.Services.Twitch
                 return null;
 
             return new FileStream(file.FullName, FileMode.Open);
+        }
+
+        public FileStream GetSoundFile(string id)
+        {
+            if (!soundCommandList.ContainsKey(id))
+                return null;
+
+            return new FileStream(soundCommandList[id], FileMode.Open);
+        }
+
+        public void ChatCommandTest(string message)
+        {
+            ProcessCommand(new ChatMessage(
+                "test", "test", "test", "Test", "#fff", Color.White,
+                null, message, UserType.Viewer, twitch.Channel, "test", false, -1, "test",
+                false, false, false, false, Noisy.NotSet,
+                message, message, null, null, 0, 0));
         }
 
         public TwitchConnectorBot(TwitchConnector connector)
