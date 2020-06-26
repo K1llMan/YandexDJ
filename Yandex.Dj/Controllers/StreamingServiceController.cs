@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -21,20 +22,6 @@ namespace Yandex.Dj.Controllers
 
         #endregion Поля
 
-        /*
-        [HttpGet("[action]")]
-        public IEnumerable<WeatherForecast> WeatherForecasts(int startDateIndex)
-        {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                DateFormatted = DateTime.Now.AddDays(index + startDateIndex).ToString("d"),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            });
-        }
-        */
-
         #region Вспомогательные функции
 
         private JObject GetBodyObject()
@@ -51,37 +38,36 @@ namespace Yandex.Dj.Controllers
 
         #region Основные функции
 
-        [HttpGet("auth")]
-        public object Auth(string login, string password)
-        {
-            return null;
-        }
-
         [HttpGet("playlists")]
+        [Description("Получение списка плейлистов")]
         public object Playlists()
         {
             return streamingService.GetPlaylists();
         }
 
         [HttpGet("playlists/update")]
+        [Description("Обновление плейлистов")]
         public void UpdatePlaylists(ProviderType type)
         {
             streamingService.UpdatePlaylists(type);
         }
 
         [HttpGet("playlist")]
+        [Description("Получение данных плейлиста")]
         public object Playlist(string user, ProviderType type, string id)
         {
             return streamingService.GetPlaylist(type, id);
         }
 
         [HttpGet("track")]
+        [Description("Получение ссылки на трек")]
         public object Track(string user, ProviderType type, string id)
         {
             return streamingService.GetMusicLink(type, id);
         }
 
         [HttpPost("currentSong")]
+        [Description("Обновление текущей композиции")]
         public void UpdateCurrentSong(string user)
         {
             JObject data = GetBodyObject();
@@ -92,6 +78,7 @@ namespace Yandex.Dj.Controllers
         }
 
         [HttpPost("chatTest")]
+        [Description("Тестирование сообщений в чате")]
         public void ChatTest()
         {
             JObject data = GetBodyObject();
@@ -99,6 +86,13 @@ namespace Yandex.Dj.Controllers
                 return;
 
             streamingService.Twitch.Bot.ChatCommandTest(data["message"].ToString());
+        }
+
+        [HttpGet("scheme")]
+        [Description("Получение схемы виджетов")]
+        public object GetWidgetsScheme()
+        {
+            return streamingService.WidgetsScheme?.ToString();
         }
 
         public StreamingServiceController(StreamingService streaming)

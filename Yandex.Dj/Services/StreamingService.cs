@@ -25,6 +25,11 @@ namespace Yandex.Dj.Services
         #region Свойства
 
         /// <summary>
+        /// Схема виджетов
+        /// </summary>
+        public JToken WidgetsScheme { get; private set; }
+
+        /// <summary>
         /// Текущий трек
         /// </summary>
         public string CurrentTrack { get; private set; }
@@ -69,6 +74,31 @@ namespace Yandex.Dj.Services
                             break;
                     }
                 }
+        }
+
+        private void InitWidgetsScheme()
+        {
+            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "widgets", "scheme.json");
+            if (!File.Exists(fileName))
+                return;
+
+            FileStream fs = null;
+            StreamReader sr = null;
+
+            try
+            {
+                fs = new FileStream(fileName, FileMode.Open);
+                sr = new StreamReader(fs);
+                WidgetsScheme = JArray.Parse(sr.ReadToEnd());
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                sr?.Close();
+                fs?.Close();
+            }
         }
 
         #endregion Вспомогательные функции
@@ -167,19 +197,21 @@ namespace Yandex.Dj.Services
                 });
             };
 
-            Twitch.Bot.TextToSpeechEvent += async eventArgs => {
-                await Broadcast.Send(new BroadcastEvent {
-                    Event = "speech",
-                    Data = eventArgs.FileName
-                });
-            };
+            if (Twitch != null) { 
+                Twitch.Bot.TextToSpeechEvent += async eventArgs => {
+                    await Broadcast.Send(new BroadcastEvent {
+                        Event = "speech",
+                        Data = eventArgs.FileName
+                    });
+                };
 
-            Twitch.Bot.SoundMessageEvent += async eventArgs => {
-                await Broadcast.Send(new BroadcastEvent {
-                    Event = "sound",
-                    Data = eventArgs.FileName
-                });
-            };
+                Twitch.Bot.SoundMessageEvent += async eventArgs => {
+                    await Broadcast.Send(new BroadcastEvent {
+                        Event = "sound",
+                        Data = eventArgs.FileName
+                    });
+                };
+            }
 
             Func<object, string> serializeMessage = o => JsonConvert.SerializeObject(o, Formatting.None,
                 new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
@@ -204,6 +236,7 @@ namespace Yandex.Dj.Services
             Twitch = new TwitchConnector((JObject)settings["twitch"]);
 
             InitProviders((JObject)settings["providers"]);
+            InitWidgetsScheme();
             InitBroadcastHandlers();
         }
 

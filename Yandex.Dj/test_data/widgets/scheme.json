@@ -1,0 +1,16 @@
+﻿[
+    {
+        type: 'song',
+        left: 0,
+        top: 90,
+        height: 10,
+        width: 30
+    },
+    {
+        type: 'soundPlayer',
+        left: 0,
+        top: 90,
+        height: 10,
+        width: 30
+    }
+]

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.IO;
 
 using Microsoft.AspNetCore.Mvc;
@@ -34,30 +35,35 @@ namespace Yandex.Dj.Controllers
         #region Основные функции
 
         [HttpGet("playlistCover")]
+        [Description("Получение обложки локального плейлиста")]
         public object GetPlaylistCover(string id)
         {
             return File(streamingService.GetPlaylistCover(id), "image/*");
         }
 
         [HttpGet("trackCover")]
+        [Description("Получение обложки локального трека")]
         public object GetTrackCover(string id)
         {
             return File(streamingService.GetTrackCover(id), "image/*");
         }
 
         [HttpGet("track")]
+        [Description("Получение локального трека")]
         public object Track(string id)
         {
             return File(streamingService.GetTrackContent(id), "audio/mpeg");
         }
 
         [HttpGet("speech")]
+        [Description("Получение речи из текста")]
         public object Speech(string id)
         {
             return File(streamingService.Twitch.Bot.GetSpeechFile(id), "audio/wav");
         }
 
         [HttpGet("sound")]
+        [Description("Получение звука")]
         public object Sound(string id)
         {
             return File(streamingService.Twitch.Bot.GetSoundFile(id), "audio/mpeg");
