@@ -92,7 +92,7 @@ namespace Yandex.Dj.Controllers
         [Description("Получение схемы виджетов")]
         public object GetWidgetsScheme()
         {
-            return streamingService.WidgetsScheme?.ToString();
+            return streamingService.WidgetsScheme.Widgets;
         }
 
         public StreamingServiceController(StreamingService streaming)

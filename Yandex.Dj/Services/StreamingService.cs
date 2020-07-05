@@ -11,6 +11,7 @@ using Yandex.Dj.Extensions;
 using Yandex.Dj.Services.ContentProviders;
 using Yandex.Dj.Services.ContentProviders.Common;
 using Yandex.Dj.Services.Twitch;
+using Yandex.Dj.Services.Widgets;
 
 namespace Yandex.Dj.Services
 {
@@ -27,7 +28,7 @@ namespace Yandex.Dj.Services
         /// <summary>
         /// Схема виджетов
         /// </summary>
-        public JToken WidgetsScheme { get; private set; }
+        public WidgetsScheme WidgetsScheme { get; private set; }
 
         /// <summary>
         /// Текущий трек
@@ -82,23 +83,7 @@ namespace Yandex.Dj.Services
             if (!File.Exists(fileName))
                 return;
 
-            FileStream fs = null;
-            StreamReader sr = null;
-
-            try
-            {
-                fs = new FileStream(fileName, FileMode.Open);
-                sr = new StreamReader(fs);
-                WidgetsScheme = JArray.Parse(sr.ReadToEnd());
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                sr?.Close();
-                fs?.Close();
-            }
+            WidgetsScheme = JsonCommon.Load<WidgetsScheme>(fileName);
         }
 
         #endregion Вспомогательные функции
