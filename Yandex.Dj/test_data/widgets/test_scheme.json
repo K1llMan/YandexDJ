@@ -1,10 +1,10 @@
 ﻿{
-    "name": "default",
+    "name": "test",
     "widgets": [
         {
             "type": "song",
             "x": 0,
-            "y": 980,
+            "y": 180,
             "width": 500,
             "height": 100,
             "order":  0
@@ -12,7 +12,7 @@
         {
             "type": "soundPlayer",
             "x": 0,
-            "y": 0,
+            "y": 500,
             "width": 500,
             "height": 100,
             "order":  0

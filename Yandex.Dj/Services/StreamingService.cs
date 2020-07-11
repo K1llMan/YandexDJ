@@ -20,15 +20,30 @@ namespace Yandex.Dj.Services
         #region Поля
 
         private List<ContentProvider> contentProviders;
+        private WidgetsScheme currentScheme;
 
         #endregion Поля
 
         #region Свойства
 
         /// <summary>
+        /// Список доступных схем
+        /// </summary>
+        public List<WidgetsScheme> WidgetsSchemes { get; private set; }
+
+        /// <summary>
         /// Схема виджетов
         /// </summary>
-        public WidgetsScheme WidgetsScheme { get; private set; }
+        public WidgetsScheme WidgetsScheme {
+            get { return currentScheme; }
+            set
+            {
+                currentScheme = value;
+                UpdateCurrentSchemeEvent?.Invoke(new UpdateCurrentSchemeEventArgs {
+                    Scheme = value
+                });
+            }
+        }
 
         /// <summary>
         /// Текущий трек
@@ -58,6 +73,15 @@ namespace Yandex.Dj.Services
         public delegate void UpdateCurrentTrackHandler(UpdateCurrentTrackEventArgs e);
         public event UpdateCurrentTrackHandler UpdateCurrentSongEvent;
 
+        // Событие обновления схемы
+        public class UpdateCurrentSchemeEventArgs
+        {
+            public WidgetsScheme Scheme{ get; internal set; }
+        }
+
+        public delegate void UpdateCurrentSchemeHandler(UpdateCurrentSchemeEventArgs e);
+        public event UpdateCurrentSchemeHandler UpdateCurrentSchemeEvent;
+
         #endregion События
 
         #region Вспомогательные функции
@@ -77,13 +101,16 @@ namespace Yandex.Dj.Services
                 }
         }
 
-        private void InitWidgetsScheme()
+        private void InitWidgetsSchemes(string current)
         {
-            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "widgets", "scheme.json");
-            if (!File.Exists(fileName))
-                return;
+            WidgetsSchemes = new List<WidgetsScheme>();
 
-            WidgetsScheme = JsonCommon.Load<WidgetsScheme>(fileName);
+            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "widgets");
+            string[] files = Directory.GetFiles(fileName, "*.json");
+            foreach (string file in files)
+                WidgetsSchemes.Add(JsonCommon.Load<WidgetsScheme>(file));
+
+            WidgetsScheme = WidgetsSchemes.FirstOrDefault(s => s.Name == current);
         }
 
         #endregion Вспомогательные функции
@@ -182,6 +209,14 @@ namespace Yandex.Dj.Services
                 });
             };
 
+            // Подписка на событие смены схемы
+            UpdateCurrentSchemeEvent += async eventArgs => {
+                await Broadcast.Send(new BroadcastEvent {
+                    Event = "updateScheme",
+                    Data = eventArgs.Scheme
+                });
+            };
+
             if (Twitch != null) { 
                 Twitch.Bot.TextToSpeechEvent += async eventArgs => {
                     await Broadcast.Send(new BroadcastEvent {
@@ -207,6 +242,13 @@ namespace Yandex.Dj.Services
                     Data = CurrentTrack
                 }));
             });
+
+            Broadcast.On("getCurrentScheme", async (wrapper, o) => {
+                await wrapper.Send(serializeMessage(new BroadcastEvent {
+                    Event = "updateScheme",
+                    Data = WidgetsScheme
+                }));
+            });
         }
 
         #endregion Обработчики сокетов
@@ -221,7 +263,7 @@ namespace Yandex.Dj.Services
             Twitch = new TwitchConnector((JObject)settings["twitch"]);
 
             InitProviders((JObject)settings["providers"]);
-            InitWidgetsScheme();
+            InitWidgetsSchemes(settings["scheme"].ToString());
             InitBroadcastHandlers();
         }
 

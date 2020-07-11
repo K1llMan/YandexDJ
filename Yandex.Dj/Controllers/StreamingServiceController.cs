@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using Yandex.Dj.Extensions;
 using Yandex.Dj.Services;
 using Yandex.Dj.Services.ContentProviders.Common;
+using Yandex.Dj.Services.Widgets;
 
 namespace Yandex.Dj.Controllers
 {
@@ -88,11 +89,25 @@ namespace Yandex.Dj.Controllers
             streamingService.Twitch.Bot.ChatCommandTest(data["message"].ToString());
         }
 
+        [HttpGet("schemes")]
+        [Description("Получение списка схем виджетов")]
+        public object GetWidgetsSchemes()
+        {
+            return streamingService.WidgetsSchemes;
+        }
+
         [HttpGet("scheme")]
         [Description("Получение схемы виджетов")]
         public object GetWidgetsScheme()
         {
             return streamingService.WidgetsScheme.Widgets;
+        }
+
+        [HttpPost("scheme")]
+        [Description("Установка схемы виджетов")]
+        public void SetWidgetsScheme([FromBody]WidgetsScheme scheme)
+        {
+            streamingService.WidgetsScheme = scheme;
         }
 
         public StreamingServiceController(StreamingService streaming)
