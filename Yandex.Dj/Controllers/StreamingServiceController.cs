@@ -1,4 +1,4 @@
-using System.ComponentModel;
+п»їusing System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -17,13 +17,13 @@ namespace Yandex.Dj.Controllers
     [Route("api/[controller]")]
     public class StreamingServiceController : Controller
     {
-        #region Поля
+        #region РџРѕР»СЏ
 
         private StreamingService streamingService;
 
-        #endregion Поля
+        #endregion РџРѕР»СЏ
 
-        #region Вспомогательные функции
+        #region Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 
         private JObject GetBodyObject()
         {
@@ -35,40 +35,40 @@ namespace Yandex.Dj.Controllers
             return JObject.Parse(data);
         }
 
-        #endregion Вспомогательные функции
+        #endregion Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 
-        #region Основные функции
+        #region РћСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё
 
         [HttpGet("playlists")]
-        [Description("Получение списка плейлистов")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїР»РµР№Р»РёСЃС‚РѕРІ")]
         public object Playlists()
         {
             return streamingService.GetPlaylists();
         }
 
         [HttpGet("playlists/update")]
-        [Description("Обновление плейлистов")]
+        [Description("РћР±РЅРѕРІР»РµРЅРёРµ РїР»РµР№Р»РёСЃС‚РѕРІ")]
         public void UpdatePlaylists(ProviderType type)
         {
             streamingService.UpdatePlaylists(type);
         }
 
         [HttpGet("playlist")]
-        [Description("Получение данных плейлиста")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РїР»РµР№Р»РёСЃС‚Р°")]
         public object Playlist(string user, ProviderType type, string id)
         {
             return streamingService.GetPlaylist(type, id);
         }
 
         [HttpGet("track")]
-        [Description("Получение ссылки на трек")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ СЃСЃС‹Р»РєРё РЅР° С‚СЂРµРє")]
         public object Track(string user, ProviderType type, string id)
         {
             return streamingService.GetMusicLink(type, id);
         }
 
         [HttpPost("currentSong")]
-        [Description("Обновление текущей композиции")]
+        [Description("РћР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСѓС‰РµР№ РєРѕРјРїРѕР·РёС†РёРё")]
         public void UpdateCurrentSong(string user)
         {
             JObject data = GetBodyObject();
@@ -79,7 +79,7 @@ namespace Yandex.Dj.Controllers
         }
 
         [HttpPost("chatTest")]
-        [Description("Тестирование сообщений в чате")]
+        [Description("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№ РІ С‡Р°С‚Рµ")]
         public void ChatTest()
         {
             JObject data = GetBodyObject();
@@ -90,21 +90,21 @@ namespace Yandex.Dj.Controllers
         }
 
         [HttpGet("schemes")]
-        [Description("Получение списка схем виджетов")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СЃС…РµРј РІРёРґР¶РµС‚РѕРІ")]
         public object GetWidgetsSchemes()
         {
             return streamingService.WidgetsSchemes;
-        }
+        } 
 
         [HttpGet("scheme")]
-        [Description("Получение схемы виджетов")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ СЃС…РµРјС‹ РІРёРґР¶РµС‚РѕРІ")]
         public object GetWidgetsScheme()
         {
             return streamingService.WidgetsScheme.Widgets;
         }
 
         [HttpPost("scheme")]
-        [Description("Установка схемы виджетов")]
+        [Description("РЈСЃС‚Р°РЅРѕРІРєР° СЃС…РµРјС‹ РІРёРґР¶РµС‚РѕРІ")]
         public void SetWidgetsScheme([FromBody]WidgetsScheme scheme)
         {
             streamingService.WidgetsScheme = scheme;
@@ -115,6 +115,6 @@ namespace Yandex.Dj.Controllers
             streamingService = streaming;
         }
 
-        #endregion Основные функции
+        #endregion РћСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё
     }
 }

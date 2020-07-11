@@ -1,4 +1,4 @@
-using System.ComponentModel;
+п»їusing System.ComponentModel;
 using System.IO;
 
 using Microsoft.AspNetCore.Mvc;
@@ -12,13 +12,13 @@ namespace Yandex.Dj.Controllers
     [Route("api/[controller]")]
     public class ContentController : Controller
     {
-        #region Поля
+        #region РџРѕР»СЏ
 
         private StreamingService streamingService;
 
-        #endregion Поля
+        #endregion РџРѕР»СЏ
 
-        #region Вспомогательные функции
+        #region Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 
         private JObject GetBodyObject()
         {
@@ -30,40 +30,40 @@ namespace Yandex.Dj.Controllers
             return JObject.Parse(data);
         }
 
-        #endregion Вспомогательные функции
+        #endregion Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 
-        #region Основные функции
+        #region РћСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё
 
         [HttpGet("playlistCover")]
-        [Description("Получение обложки локального плейлиста")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ РѕР±Р»РѕР¶РєРё Р»РѕРєР°Р»СЊРЅРѕРіРѕ РїР»РµР№Р»РёСЃС‚Р°")]
         public object GetPlaylistCover(string id)
         {
             return File(streamingService.GetPlaylistCover(id), "image/*");
         }
 
         [HttpGet("trackCover")]
-        [Description("Получение обложки локального трека")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ РѕР±Р»РѕР¶РєРё Р»РѕРєР°Р»СЊРЅРѕРіРѕ С‚СЂРµРєР°")]
         public object GetTrackCover(string id)
         {
             return File(streamingService.GetTrackCover(id), "image/*");
         }
 
         [HttpGet("track")]
-        [Description("Получение локального трека")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ Р»РѕРєР°Р»СЊРЅРѕРіРѕ С‚СЂРµРєР°")]
         public object Track(string id)
         {
             return File(streamingService.GetTrackContent(id), "audio/mpeg");
         }
 
         [HttpGet("speech")]
-        [Description("Получение речи из текста")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ СЂРµС‡Рё РёР· С‚РµРєСЃС‚Р°")]
         public object Speech(string id)
         {
             return File(streamingService.Twitch.Bot.GetSpeechFile(id), "audio/wav");
         }
 
         [HttpGet("sound")]
-        [Description("Получение звука")]
+        [Description("РџРѕР»СѓС‡РµРЅРёРµ Р·РІСѓРєР°")]
         public object Sound(string id)
         {
             return File(streamingService.Twitch.Bot.GetSoundFile(id), "audio/mpeg");
@@ -74,6 +74,6 @@ namespace Yandex.Dj.Controllers
             streamingService = streaming;
         }
 
-        #endregion Основные функции
+        #endregion РћСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё
     }
 }
