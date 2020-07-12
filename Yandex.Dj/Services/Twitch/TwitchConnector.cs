@@ -4,6 +4,7 @@ using System.Text;
 
 using Newtonsoft.Json.Linq;
 
+using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -26,6 +27,11 @@ namespace Yandex.Dj.Services.Twitch
         /// Бот
         /// </summary>
         public TwitchConnectorBot Bot { get; private set; }
+
+        /// <summary>
+        /// API
+        /// </summary>
+        public TwitchAPI API { get; private set; }
 
         /// <summary>
         /// Канал
@@ -94,6 +100,7 @@ namespace Yandex.Dj.Services.Twitch
 
         public TwitchConnector(JObject config)
         {
+            API = new TwitchAPI();
             Bot = new TwitchConnectorBot(this);
 
             Connect(config);

@@ -136,6 +136,10 @@ namespace Yandex.Dj.Services.Twitch
 
                         lastSound = DateTime.Now;
                         break;
+                    case "!time":
+                        TimeSpan? time = twitch.API.V5.Streams.GetUptimeAsync(twitch.Channel).GetAwaiter().GetResult();
+                        Send($"Время в эфире: {time?.ToString("hh:mm:ss")}");
+                        break;
                     default:
                         if (soundCommandList.ContainsKey(command.TrimStart('!'))) {
                             if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
