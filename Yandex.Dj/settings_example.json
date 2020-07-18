@@ -2,6 +2,7 @@
 	"scheme": "",
 	"twitch": {
 		"login": "",
+		"clientId": "",
 		"token": "",
 		"channel": ""
 	},

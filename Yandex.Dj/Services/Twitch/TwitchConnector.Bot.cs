@@ -137,8 +137,13 @@ namespace Yandex.Dj.Services.Twitch
                         lastSound = DateTime.Now;
                         break;
                     case "!time":
-                        TimeSpan? time = twitch.API.V5.Streams.GetUptimeAsync(twitch.Channel).GetAwaiter().GetResult();
-                        Send($"Время в эфире: {time?.ToString("hh:mm:ss")}");
+                        if (!twitch.API.V5.Streams.BroadcasterOnlineAsync(twitch.UserID).GetAwaiter().GetResult()) {
+                            Send($"Трансляция не ведётся.");
+                            break;
+                        }
+
+                        TimeSpan? time = twitch.API.V5.Streams.GetUptimeAsync(twitch.UserID).GetAwaiter().GetResult();
+                        Send($"Время в эфире: {time}");
                         break;
                     default:
                         if (soundCommandList.ContainsKey(command.TrimStart('!'))) {

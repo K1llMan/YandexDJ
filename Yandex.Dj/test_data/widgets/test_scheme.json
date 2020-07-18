@@ -7,6 +7,7 @@
             "y": 180,
             "width": 500,
             "height": 100,
+            "visible": true,
             "order":  0
         },
         {
@@ -15,6 +16,7 @@
             "y": 500,
             "width": 500,
             "height": 100,
+            "visible": true,
             "order":  0
         }
     ]

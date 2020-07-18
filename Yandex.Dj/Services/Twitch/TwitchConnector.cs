@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using Newtonsoft.Json.Linq;
 
 using TwitchLib.Api;
+using TwitchLib.Api.Core;
+using TwitchLib.Api.V5.Models.Users;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -38,6 +39,11 @@ namespace Yandex.Dj.Services.Twitch
         /// </summary>
         public string Channel { get; private set; }
 
+        /// <summary>
+        /// Идентификатор пользователя для API
+        /// </summary>
+        public string UserID { get; private set; }
+
         #endregion Свойства
 
         #region Вспомогательные функции
@@ -58,10 +64,8 @@ namespace Yandex.Dj.Services.Twitch
                 Console.WriteLine(args.ChatMessage.Message);
         }
 
-        private void Connect(JObject config)
+        private void ClientConnect(JObject config)
         {
-            Channel = config["channel"].ToString();
-
             // Token сгенерирован twitchtokengenerator
             ConnectionCredentials credentials = new ConnectionCredentials(config["login"].ToString(), config["token"].ToString());
             ClientOptions clientOptions = new ClientOptions {
@@ -89,6 +93,20 @@ namespace Yandex.Dj.Services.Twitch
             client.Connect();
         }
 
+        private void APIConnect(JObject config)
+        {
+            API = new TwitchAPI(settings: new ApiSettings
+            {
+                ClientId = config["clientId"].ToString(),
+                AccessToken = config["token"].ToString()
+            });
+
+
+            User[] users = API.V5.Users.GetUserByNameAsync(Channel).GetAwaiter().GetResult().Matches;
+            if (users.Length > 0)
+                UserID = users.First().Id;
+        }
+
         #endregion Вспомогательные функции
 
         #region Основные функции
@@ -100,10 +118,11 @@ namespace Yandex.Dj.Services.Twitch
 
         public TwitchConnector(JObject config)
         {
-            API = new TwitchAPI();
             Bot = new TwitchConnectorBot(this);
+            Channel = config["channel"].ToString();
 
-            Connect(config);
+            ClientConnect(config);
+            APIConnect(config);
         }
 
         #endregion Основные функции
