@@ -25,10 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Yandex.Music.Api\Yandex.Music.Api\Yandex.Music.Api.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="test_data\**\*.*">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
@@ -36,6 +32,10 @@
 	
   <ItemGroup>
     <TestData Include="test_data\**" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\..\Yandex.Music.Api\Yandex.Music.Client\Yandex.Music.Client.csproj" />
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="AfterBuild">

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Newtonsoft.Json.Linq;
 
 using Yandex.Dj.Services.ContentProviders.Common;
-using Yandex.Music.Api;
-using Yandex.Music.Api.Common;
-using Yandex.Music.Api.Common.YPlaylist;
+using Yandex.Music.Api.Models.Playlist;
+using Yandex.Music.Client;
+using Yandex.Music.Client.Extensions;
 
 namespace Yandex.Dj.Services.ContentProviders
 {
@@ -16,8 +14,7 @@ namespace Yandex.Dj.Services.ContentProviders
     {
         #region Поля
 
-        private YandexMusicApi api;
-        private YAuthStorage storage;
+        private YandexMusicClient client;
 
         #endregion Поля
 
@@ -25,11 +22,10 @@ namespace Yandex.Dj.Services.ContentProviders
 
         private void InitAPI()
         {
-            api = new YandexMusicApi();
-            storage = new YAuthStorage();
+            client = new YandexMusicClient();
 
             // Авторизация
-            api.UserAPI.Authorize(storage, Config["token"].ToString());
+            client.Authorize(Config["token"].ToString());
         }
 
         private string GetCover(string url, int size)
@@ -44,7 +40,7 @@ namespace Yandex.Dj.Services.ContentProviders
             playlists = new List<PlaylistInfo>();
 
             // Кэширование плейлистов
-            api.PlaylistAPI.Favorites(storage)
+            client.GetFavorites()
                 .ForEach(p => {
                     playlists.Add(new PlaylistInfo {
                         Type = ProviderType.Yandex,
@@ -55,7 +51,7 @@ namespace Yandex.Dj.Services.ContentProviders
                 });
 
             // Персональные плейлисты
-            api.PlaylistAPI.MainPagePersonal(storage)
+            client.GetPersonalPlaylists()
                 .ForEach(p => {
                     playlists.Add(new PlaylistInfo {
                         Type = ProviderType.Yandex,
@@ -79,7 +75,7 @@ namespace Yandex.Dj.Services.ContentProviders
         {
             string[] keys = id.Split(':');
 
-            YPlaylist playlist = api.PlaylistAPI.Get(storage, keys[0], keys[1]);
+            YPlaylist playlist = client.GetPlaylist(keys[0], keys[1]);
 
             return new Playlist {
                 Type = ProviderType.Yandex,
@@ -100,7 +96,7 @@ namespace Yandex.Dj.Services.ContentProviders
 
         public override string GetTrack(string id)
         {
-            return api.TrackAPI.GetFileLink(storage, id);
+            return client.GetTrack(id).GetLink();
         }
 
         #endregion Перегружаемые функции
