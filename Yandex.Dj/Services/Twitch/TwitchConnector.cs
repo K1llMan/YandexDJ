@@ -12,6 +12,8 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 
+using Yandex.Dj.Services.Bot;
+
 namespace Yandex.Dj.Services.Twitch
 {
     public class TwitchConnector
@@ -27,7 +29,7 @@ namespace Yandex.Dj.Services.Twitch
         /// <summary>
         /// Бот
         /// </summary>
-        public TwitchConnectorBot Bot { get; private set; }
+        public BotService Bot { get; private set; }
 
         /// <summary>
         /// API
@@ -60,8 +62,17 @@ namespace Yandex.Dj.Services.Twitch
 
         private void OnMessageReceived(object sender, OnMessageReceivedArgs args)
         {
-            if (!Bot.ProcessCommand(args.ChatMessage))
-                Console.WriteLine(args.ChatMessage.Message);
+            BotMessage message = Bot.ProcessCommand(args.ChatMessage.Username, args.ChatMessage.Message);
+
+            switch(message) {
+                case { Type: BotMessageType.Error }:  
+                    Console.WriteLine(args.ChatMessage.Message);
+                    break;
+
+                case { Type: BotMessageType.Success } when !string.IsNullOrEmpty(message.Text) :
+                    Send(message.Text);
+                    break;
+            };
         }
 
         private void ClientConnect(JObject config)
@@ -116,9 +127,9 @@ namespace Yandex.Dj.Services.Twitch
             client.SendMessage(Channel, message);
         }
 
-        public TwitchConnector(JObject config)
+        public TwitchConnector(BotService bot, JObject config)
         {
-            Bot = new TwitchConnectorBot(this);
+            Bot = bot;
             Channel = config["channel"].ToString();
 
             ClientConnect(config);

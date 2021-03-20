@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 using Yandex.Dj.Extensions;
+using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.ContentProviders;
 using Yandex.Dj.Services.ContentProviders.Common;
 using Yandex.Dj.Services.Twitch;
@@ -54,6 +55,11 @@ namespace Yandex.Dj.Services
         /// Управление данными через сокеты
         /// </summary>
         public Broadcast Broadcast { get; private set; }
+
+        /// <summary>
+        /// Бот
+        /// </summary>
+        public BotService Bot { get; set; }
 
         /// <summary>
         /// Управление Twitch
@@ -217,22 +223,36 @@ namespace Yandex.Dj.Services
                 });
             };
 
-            if (Twitch != null) { 
-                Twitch.Bot.TextToSpeechEvent += async eventArgs => {
-                    await Broadcast.Send(new BroadcastEvent {
-                        Event = "speech",
-                        Data = eventArgs.FileName
-                    });
-                };
+            // События бота
+            Bot.TextToSpeechEvent += async eventArgs => {
+                await Broadcast.Send(new BroadcastEvent {
+                    Event = "speech",
+                    Data = eventArgs.FileName
+                });
+            };
 
-                Twitch.Bot.SoundMessageEvent += async eventArgs => {
-                    await Broadcast.Send(new BroadcastEvent {
-                        Event = "sound",
-                        Data = eventArgs.FileName
-                    });
-                };
-            }
+            Bot.SoundMessageEvent += async eventArgs => {
+                await Broadcast.Send(new BroadcastEvent {
+                    Event = "sound",
+                    Data = eventArgs.FileName
+                });
+            };
 
+            Bot.TrackAddEvent += async eventArgs => {
+                await Broadcast.Send(new BroadcastEvent {
+                    Event = "addRocksmithTrack",
+                    Data = eventArgs.Track
+                });
+            };
+
+            Bot.TrackRemoveEvent += async eventArgs => {
+                await Broadcast.Send(new BroadcastEvent {
+                    Event = "removeRocksmithTrack",
+                    Data = eventArgs.Track
+                });
+            };
+
+            // Подписка на события
             Func<object, string> serializeMessage = o => JsonConvert.SerializeObject(o, Formatting.None,
                 new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
 
@@ -249,18 +269,29 @@ namespace Yandex.Dj.Services
                     Data = WidgetsScheme
                 }));
             });
+
+            Broadcast.On("getRocksmithTracks", async (wrapper, o) => {
+                await wrapper.Send(serializeMessage(new BroadcastEvent
+                {
+                    Event = "updateRocksmithTracks",
+                    Data = Bot.TrackList
+                }));
+            });
         }
 
         #endregion Обработчики сокетов
 
-        public StreamingService()
+        public StreamingService(BotService bot)
         {
+            // Бот
+            Bot = bot;
+
             // Настройки приложения
             JObject settings = JsonCommon.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json"));
 
             contentProviders = new List<ContentProvider>();
             Broadcast = new Broadcast();
-            Twitch = new TwitchConnector((JObject)settings["twitch"]);
+            Twitch = new TwitchConnector(Bot, (JObject)settings["twitch"]);
 
             InitProviders((JObject)settings["providers"]);
             InitWidgetsSchemes(settings["scheme"].ToString());

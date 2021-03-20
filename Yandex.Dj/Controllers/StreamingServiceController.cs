@@ -1,14 +1,14 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Yandex.Dj.Extensions;
 using Yandex.Dj.Services;
+using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.ContentProviders.Common;
 using Yandex.Dj.Services.Widgets;
 
@@ -80,13 +80,32 @@ namespace Yandex.Dj.Controllers
 
         [HttpPost("chatTest")]
         [Description("Тестирование сообщений в чате")]
-        public void ChatTest()
+        public BotMessage ChatTest()
         {
             JObject data = GetBodyObject();
             if (data.IsNullOrEmpty())
-                return;
+                return new BotMessage {
+                    Type = BotMessageType.Error,
+                    Text = "Ошибка разбора тела сообщения"
+                };
 
-            streamingService.Twitch.Bot.ChatCommandTest(data["message"].ToString());
+            return streamingService.Bot.ChatCommandTest(data["user"].ToString(), data["message"].ToString());
+        }
+
+        [HttpGet("tracks")]
+        [Description("Список треков в очереди")]
+        public List<RocksmithTrack> GetTrackList()
+        {
+            return streamingService.Bot.TrackList;
+        }
+
+        [HttpPost("removeTrack")]
+        [Description("Удаление трека из очереди")]
+        public NoContentResult RemoveTrack([FromBody]RocksmithTrack track)
+        {
+            streamingService.Bot.RemoveTrack(track);
+
+            return NoContent();
         }
 
         [HttpGet("schemes")]

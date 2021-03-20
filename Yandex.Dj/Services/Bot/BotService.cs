@@ -1,25 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-using TwitchLib.Client.Enums;
-using TwitchLib.Client.Models;
-
 using Yandex.Dj.Extensions;
 
-namespace Yandex.Dj.Services.Twitch
+namespace Yandex.Dj.Services.Bot
 {
-    public class TwitchConnectorBot
+    public class BotService
     {
         #region Поля
 
-        private TwitchConnector twitch;
+        // Директории бота
         private DirectoryInfo botDir;
         private DirectoryInfo speechDir;
         private DirectoryInfo speechDirCache;
@@ -51,23 +47,33 @@ namespace Yandex.Dj.Services.Twitch
         public delegate void SoundMessageHandler(SoundMessageEventArgs e);
         public event SoundMessageHandler SoundMessageEvent;
 
+        // Событие добавления/удаления трека
+        public class TrackEventArgs {
+            public RocksmithTrack Track { get; internal set; }
+        }
+
+        public delegate void TrackHandler(TrackEventArgs e);
+        public event TrackHandler TrackAddEvent;
+
+        public event TrackHandler TrackRemoveEvent;
+
         #endregion События
 
         #region Свойства
 
+        /// <summary>
+        /// Таймаут звука
+        /// </summary>
         public int SoundTimeout { get; private set; }
+
+        /// <summary>
+        /// Список треков
+        /// </summary>
+        public List<RocksmithTrack> TrackList { get; private set; }
 
         #endregion Свойства
 
         #region Вспомогательные функции
-
-        /// <summary>
-        /// Отправить сообщение в чат
-        /// </summary>
-        private void Send(string message)
-        {
-            twitch.Send(message);
-        }
 
         private void Init()
         {
@@ -75,7 +81,8 @@ namespace Yandex.Dj.Services.Twitch
             commandList = new List<string>();
 
             JObject settings = JsonCommon.Load(Path.Combine(botDir.FullName, "bot.json"));
-            if (!settings.IsNullOrEmpty()) {
+            if (!settings.IsNullOrEmpty())
+            {
                 commandList = JsonConvert.DeserializeObject<List<string>>(settings["commands"].ToString());
                 SoundTimeout = Convert.ToInt32(settings["soundTimeout"].ToString());
             }
@@ -86,7 +93,8 @@ namespace Yandex.Dj.Services.Twitch
 
         private string TextToSpeech(string text)
         {
-            if (!speechDirCache.Exists) {
+            if (!speechDirCache.Exists)
+            {
                 speechDirCache.Create();
                 speechDirCache.Refresh();
             }
@@ -94,8 +102,8 @@ namespace Yandex.Dj.Services.Twitch
             string fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             string path = Path.Combine(speechDirCache.FullName, $"{fileName}.wav");
 
-            Process process = new Process {
-                StartInfo = new ProcessStartInfo(Path.Combine(speechDir.FullName, "balcon.exe"), 
+            Process process = new() {
+                StartInfo = new ProcessStartInfo(Path.Combine(speechDir.FullName, "balcon.exe"),
                     $"-t \"{text}\" -w \"{path}\""
                 )
             };
@@ -110,24 +118,31 @@ namespace Yandex.Dj.Services.Twitch
 
         #region Обработка команд
 
-        public bool ProcessCommand(ChatMessage chatMessage)
+        public BotMessage ProcessCommand(string user, string message)
         {
-            string message = chatMessage.Message.Trim();
-
-            if (message.StartsWith("!")) {
+            if (message.StartsWith("!"))
+            {
                 string command = message.GetMatches(@"^!\w+").First();
                 string data = message.GetMatches(@"(?<=\b[\s]).+").FirstOrDefault();
 
                 if (!commandList.Contains(command) && !soundCommandList.ContainsKey(command.TrimStart('!')))
-                    return false;
+                    return new BotMessage {
+                        Type = BotMessageType.NotCommand
+                    };
 
-                switch (command) {
+                switch (command)
+                {
                     case "!привет":
-                        Send($"Привет, {chatMessage.DisplayName}!");
-                        break;
+                        return new BotMessage {
+                            Text = $"Привет, {user}!",
+                            Type = BotMessageType.Success
+                        };
+
                     case "!озвучить":
                         if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
-                            return true;
+                            return new BotMessage {
+                                Type = BotMessageType.Error
+                            };
 
                         string id = TextToSpeech(data);
                         TextToSpeechEvent?.Invoke(new TextToSpeechEventArgs {
@@ -136,40 +151,76 @@ namespace Yandex.Dj.Services.Twitch
 
                         lastSound = DateTime.Now;
                         break;
-                    case "!time":
-                        if (!twitch.API.V5.Streams.BroadcasterOnlineAsync(twitch.UserID).GetAwaiter().GetResult()) {
-                            Send($"Трансляция не ведётся.");
-                            break;
-                        }
 
-                        TimeSpan? time = twitch.API.V5.Streams.GetUptimeAsync(twitch.UserID).GetAwaiter().GetResult();
-                        Send($"Время в эфире: {time}");
-                        break;
+                    case "!time":
+                        return new BotMessage {
+                            Text = $"Время в эфире: {DateTime.Now}",
+                            Type = BotMessageType.Success
+                        };
+
+                    case "!sr":
+                    case "!заказ":
+                        List<string> parts = data.Split("|")
+                            .Select(p => p.Trim())
+                            .ToList();
+
+                        for (int i = 0; i < 4 - parts.Count; i++) 
+                            parts.Add("Any");
+
+                        Enum.TryParse(parts[2], out RocksmithTrackArrangement arrangement);
+
+                        RocksmithTrack track = new() {
+                            Artist = parts[0],
+                            Name = parts[1],
+                            User = user,
+                            ArrangementType = arrangement
+                        };
+
+                        TrackList.Add(track);
+
+                        TrackAddEvent?.Invoke(new TrackEventArgs {
+                            Track = track
+                        });
+
+                        return new BotMessage {
+                            Type = BotMessageType.Success,
+                            Text = "Трек добавлен"
+                        };
+
                     default:
-                        if (soundCommandList.ContainsKey(command.TrimStart('!'))) {
+                        if (soundCommandList.ContainsKey(command.TrimStart('!')))
+                        {
                             if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
-                                return true;
+                                return new BotMessage {
+                                    Type = BotMessageType.Error
+                                };
 
                             SoundMessageEvent?.Invoke(new SoundMessageEventArgs {
                                 FileName = command.TrimStart('!')
                             });
 
                             lastSound = DateTime.Now;
-                            break;
                         }
                         break;
                 }
 
-                return true;
+                return new BotMessage {
+                    Type = BotMessageType.Success
+                };
             }
 
-            return false;
+            return new BotMessage {
+                Type = BotMessageType.NotCommand
+            };
         }
 
         #endregion Обработка команд
 
         #region Основные функции
 
+        /// <summary>
+        /// Получение файла с речью
+        /// </summary>
         public FileStream GetSpeechFile(string id)
         {
             FileInfo file = speechDirCache.GetFiles($"{id}.wav").FirstOrDefault();
@@ -179,6 +230,9 @@ namespace Yandex.Dj.Services.Twitch
             return new FileStream(file.FullName, FileMode.Open);
         }
 
+        /// <summary>
+        /// Получения файла со звуком
+        /// </summary>
         public FileStream GetSoundFile(string id)
         {
             if (!soundCommandList.ContainsKey(id))
@@ -187,26 +241,39 @@ namespace Yandex.Dj.Services.Twitch
             return new FileStream(soundCommandList[id], FileMode.Open);
         }
 
-        public void ChatCommandTest(string message)
+        public void RemoveTrack(RocksmithTrack track)
         {
-            ProcessCommand(new ChatMessage(
-                "test", "test", "test", "Test", "#fff", Color.White,
-                null, message, UserType.Viewer, twitch.Channel, "test", false, -1, "test",
-                false, false, false, false, Noisy.NotSet,
-                message, message, null, null, 0, 0));
+            if (!TrackList.Contains(track))
+                return;
+
+            TrackList.Remove(track);
+
+            TrackRemoveEvent?.Invoke(new TrackEventArgs {
+                Track = track
+            });
         }
 
-        public TwitchConnectorBot(TwitchConnector connector)
+        /// <summary>
+        /// Тестирование команд бота
+        /// </summary>
+        public BotMessage ChatCommandTest(string user, string message)
         {
-            twitch = connector;
+            return ProcessCommand(user, message);
+        }
+
+        public BotService()
+        {
             botDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bot"));
             speechDir = new DirectoryInfo(Path.Combine(botDir.FullName, "speech"));
             speechDirCache = new DirectoryInfo(Path.Combine(speechDir.FullName, "cache"));
 
-            if (speechDirCache.Exists) {
+            if (speechDirCache.Exists)
+            {
                 speechDirCache.Delete(true);
                 speechDirCache.Refresh();
             }
+
+            TrackList = new List<RocksmithTrack>();
 
             Init();
         }

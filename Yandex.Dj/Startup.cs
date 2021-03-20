@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Yandex.Dj.Services;
+using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.SocketHandler;
 
 namespace Yandex.Dj
@@ -32,6 +33,7 @@ namespace Yandex.Dj
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
+            services.AddSingleton(typeof(BotService));
             services.AddSingleton(typeof(StreamingService));
 
             // In production, the React files will be served from this directory

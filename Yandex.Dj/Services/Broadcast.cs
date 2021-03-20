@@ -2,13 +2,17 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 using Yandex.Dj.Services.SocketHandler;
+
+using JsonConverter = Newtonsoft.Json.JsonConverter;
 
 namespace Yandex.Dj.Services
 {
@@ -28,6 +32,13 @@ namespace Yandex.Dj.Services
     public class Broadcast
     {
         #region Поля
+
+        private JsonSerializerSettings jsonSettings = new() {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            Converters = new List<JsonConverter> {
+                new StringEnumConverter()
+            }
+        };
 
         private ConcurrentDictionary<string, WebSocketWrapper> sockets = new ConcurrentDictionary<string, WebSocketWrapper>();
         private Dictionary<string, List<Action<WebSocketWrapper,object>>> handlers = new Dictionary<string, List<Action<WebSocketWrapper,object>>>();
@@ -56,7 +67,7 @@ namespace Yandex.Dj.Services
         {
             foreach (BroadcastEvent action in actions)
             {
-                string dataStr = JsonConvert.SerializeObject(action, Formatting.None, new JsonSerializerSettings{ ContractResolver = new CamelCasePropertyNamesContractResolver() });
+                string dataStr = JsonConvert.SerializeObject(action, Formatting.None, jsonSettings);
 
                 foreach (WebSocketWrapper socket in sockets.Values)
                     await socket.Send(dataStr);
@@ -79,7 +90,6 @@ namespace Yandex.Dj.Services
             }
             catch (Exception ex) {
             }
-
         }
 
         /// <summary>

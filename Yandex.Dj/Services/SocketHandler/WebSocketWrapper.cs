@@ -144,8 +144,6 @@ namespace Yandex.Dj.Services.SocketHandler
 
             data = new StringBuilder();
             size = bufferSize;
-
-            Send("{ \"name\":\"ololo\"}");
         }
 
         #endregion Основные функции

@@ -18,6 +18,16 @@
             "height": 100,
             "visible": true,
             "order":  0
+        },
+        {
+            "type": "rocksmith",
+            "x": 500,
+            "y": 300,
+            "width": 500,
+            "height": 100,
+            "visible": true,
+            "order":  0
         }
+
     ]
 }
