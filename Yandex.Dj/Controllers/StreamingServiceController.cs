@@ -28,7 +28,7 @@ namespace Yandex.Dj.Controllers
         private JObject GetBodyObject()
         {
             string data;
-            using (StreamReader sr = new StreamReader(Request.Body)) {
+            using (StreamReader sr = new(Request.Body)) {
                 data = sr.ReadToEndAsync().Result;
             }
 

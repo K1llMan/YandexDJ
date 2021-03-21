@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 using Yandex.Dj.Services;
+using Yandex.Dj.Services.ContentProviders.Common;
 
 namespace Yandex.Dj.Controllers
 {
@@ -23,7 +24,7 @@ namespace Yandex.Dj.Controllers
         private JObject GetBodyObject()
         {
             string data;
-            using (StreamReader sr = new StreamReader(Request.Body)) {
+            using (StreamReader sr = new(Request.Body)) {
                 data = sr.ReadToEndAsync().Result;
             }
 
@@ -49,24 +50,24 @@ namespace Yandex.Dj.Controllers
         }
 
         [HttpGet("track")]
-        [Description("Получение локального трека")]
-        public object Track(string id)
+        [Description("Получение трека")]
+        public object Track(ProviderType type, string id)
         {
-            return File(streamingService.GetTrackContent(id), "audio/mpeg");
+            return File(streamingService.GetTrackContent(type, id), "audio/mpeg");
         }
 
         [HttpGet("speech")]
         [Description("Получение речи из текста")]
         public object Speech(string id)
         {
-            return File(streamingService.Twitch.Bot.GetSpeechFile(id), "audio/wav");
+            return File(streamingService.Bot.GetSpeechFile(id), "audio/wav");
         }
 
         [HttpGet("sound")]
         [Description("Получение звука")]
         public object Sound(string id)
         {
-            return File(streamingService.Twitch.Bot.GetSoundFile(id), "audio/mpeg");
+            return File(streamingService.Bot.GetSoundFile(id), "audio/mpeg");
         }
 
         public ContentController(StreamingService streaming)

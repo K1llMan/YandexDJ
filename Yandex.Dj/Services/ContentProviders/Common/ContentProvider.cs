@@ -60,6 +60,14 @@ namespace Yandex.Dj.Services.ContentProviders.Common
             return string.Empty;
         }
 
+        /// <summary>
+        /// Получить содержимое трекп
+        /// </summary>
+        public virtual FileStream GetTrackContent(string id)
+        {
+            return null;
+        }
+
         #endregion Перегружаемые функции
 
         #region Основные функция

@@ -22,11 +22,11 @@ namespace Yandex.Dj.Controllers
         [Description("Справка по предоставляемому сервисом API")]
         public object GetMethods()
         {
-            JObject apiList = new JObject();
+            JObject apiList = new();
             Assembly assembly = Assembly.GetExecutingAssembly();
             foreach (Type type in assembly.GetTypes().Where(t => t.Name.IsMatch("Controller")))
             {
-                JArray controllerMethods = new JArray();
+                JArray controllerMethods = new();
 
                 RouteAttribute route = (RouteAttribute)type.GetCustomAttributes(typeof(RouteAttribute)).FirstOrDefault();
                 string controllerName = type.Name.Replace("Controller", string.Empty);
@@ -36,7 +36,7 @@ namespace Yandex.Dj.Controllers
                     foreach (HttpMethodAttribute attr in method.GetCustomAttributes(typeof(HttpMethodAttribute)))
                     {
                         // Путь
-                        JObject apiMethod = new JObject {
+                        JObject apiMethod = new() {
                             { "route", $"{string.Join(", ", attr.HttpMethods)} {string.Join("/", new string[] { mainRoute, attr.Template }.Where(s => !string.IsNullOrEmpty(s)))}" }
                         };
 
@@ -57,7 +57,7 @@ namespace Yandex.Dj.Controllers
                         ParameterInfo[] parameters = method.GetParameters();
                         if (parameters.Length > 0)
                         {
-                            JArray methodParams = new JArray();
+                            JArray methodParams = new();
                             foreach (ParameterInfo parameter in method.GetParameters())
                                 methodParams.Add(new JObject {
                                     { "name", parameter.Name },

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Newtonsoft.Json.Linq;
@@ -15,6 +16,7 @@ namespace Yandex.Dj.Services.ContentProviders
         #region Поля
 
         private YandexMusicClient client;
+        private string cacheDir;
 
         #endregion Поля
 
@@ -96,7 +98,22 @@ namespace Yandex.Dj.Services.ContentProviders
 
         public override string GetTrack(string id)
         {
-            return client.GetTrack(id).GetLink();
+            string name = id.Replace(":", "-");
+            string path = Path.Combine(cacheDir, name);
+
+            if (!File.Exists(path))
+                client.GetTrack(id).Save(path);
+
+            return $"api/content/track?type=yandex&id={name}";
+        }
+
+        public override FileStream GetTrackContent(string id)
+        {
+            string path = Path.Combine(cacheDir, id);
+            if (!File.Exists(path))
+                return null;
+
+            return new FileStream(path, FileMode.Open);
         }
 
         #endregion Перегружаемые функции
@@ -106,6 +123,10 @@ namespace Yandex.Dj.Services.ContentProviders
         public YandexMusicProvider(JObject config) : base(config)
         {
             Type = ProviderType.Yandex;
+
+            cacheDir = Path.Combine(appDir.FullName, "cache", "yandex");
+            if (!Directory.Exists(cacheDir))
+                Directory.CreateDirectory(cacheDir);
 
             InitAPI();
 

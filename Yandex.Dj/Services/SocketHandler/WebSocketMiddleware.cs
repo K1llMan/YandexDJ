@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
-
-using Newtonsoft.Json;
 
 namespace Yandex.Dj.Services.SocketHandler
 {
@@ -17,7 +14,7 @@ namespace Yandex.Dj.Services.SocketHandler
     {
         #region Поля
 
-        private static Regex pathRegex = new Regex("/api/ws");
+        private static Regex pathRegex = new("/api/ws");
 
         private readonly RequestDelegate nextDelegate;
 

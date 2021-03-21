@@ -194,9 +194,9 @@ namespace Yandex.Dj.Services
             return provider?.GetTrackCover(id);
         }
 
-        public FileStream GetTrackContent(string id)
+        public FileStream GetTrackContent(ProviderType type, string id)
         {
-            LocalProvider provider = (LocalProvider)contentProviders.FirstOrDefault(p => p.Type == ProviderType.Local);
+            ContentProvider provider = contentProviders.FirstOrDefault(p => p.Type == type);
 
             return provider?.GetTrackContent(id);
         }

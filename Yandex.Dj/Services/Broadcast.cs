@@ -2,12 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 using Yandex.Dj.Services.SocketHandler;
@@ -40,8 +38,8 @@ namespace Yandex.Dj.Services
             }
         };
 
-        private ConcurrentDictionary<string, WebSocketWrapper> sockets = new ConcurrentDictionary<string, WebSocketWrapper>();
-        private Dictionary<string, List<Action<WebSocketWrapper,object>>> handlers = new Dictionary<string, List<Action<WebSocketWrapper,object>>>();
+        private ConcurrentDictionary<string, WebSocketWrapper> sockets = new();
+        private Dictionary<string, List<Action<WebSocketWrapper,object>>> handlers = new();
 
         #endregion Поля
 
@@ -68,6 +66,7 @@ namespace Yandex.Dj.Services
             foreach (BroadcastEvent action in actions)
             {
                 string dataStr = JsonConvert.SerializeObject(action, Formatting.None, jsonSettings);
+                Console.Write(dataStr);
 
                 foreach (WebSocketWrapper socket in sockets.Values)
                     await socket.Send(dataStr);
@@ -97,7 +96,7 @@ namespace Yandex.Dj.Services
         /// </summary>
         public WebSocketWrapper Add(WebSocket socket)
         {
-            WebSocketWrapper webSocketWrapper = new WebSocketWrapper(socket);
+            WebSocketWrapper webSocketWrapper = new(socket);
 
             webSocketWrapper.OnReceive += async (s, args) => await Invoke(s, args.Data);
             webSocketWrapper.OnClose += (s, args) => {

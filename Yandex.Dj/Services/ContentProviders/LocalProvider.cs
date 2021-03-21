@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Yandex.Dj.Extensions;
@@ -142,7 +139,7 @@ namespace Yandex.Dj.Services.ContentProviders
 
         public override string GetTrack(string id)
         {
-            return $"api/content/track?id={id}";
+            return $"api/content/track?type=local&id={id}";
         }
 
         #endregion Перегружаемые функции
@@ -174,7 +171,7 @@ namespace Yandex.Dj.Services.ContentProviders
                 : new FileStream(path, FileMode.Open);
         }
 
-        public FileStream GetTrackContent(string id)
+        public override FileStream GetTrackContent(string id)
         {
             string pId = id.Split(':')[0];
 

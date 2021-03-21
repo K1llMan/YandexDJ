@@ -70,7 +70,7 @@ namespace Yandex.Dj.Services.Twitch
                     break;
 
                 case { Type: BotMessageType.Success } when !string.IsNullOrEmpty(message.Text) :
-                    Send(message.Text);
+                    //Send(message.Text);
                     break;
             };
         }
@@ -78,13 +78,13 @@ namespace Yandex.Dj.Services.Twitch
         private void ClientConnect(JObject config)
         {
             // Token сгенерирован twitchtokengenerator
-            ConnectionCredentials credentials = new ConnectionCredentials(config["login"].ToString(), config["token"].ToString());
-            ClientOptions clientOptions = new ClientOptions {
+            ConnectionCredentials credentials = new(config["login"].ToString(), config["token"].ToString());
+            ClientOptions clientOptions = new() {
                 MessagesAllowedInPeriod = 750,
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
             };
 
-            WebSocketClient customClient = new WebSocketClient(clientOptions);
+            WebSocketClient customClient = new(clientOptions);
             client = new TwitchClient(customClient);
             client.Initialize(credentials, Channel);
 
