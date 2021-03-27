@@ -24,6 +24,7 @@ namespace Yandex.Dj.Services.Bot
         private Dictionary<string, string> soundCommandList;
 
         private DateTime lastSound = DateTime.Now;
+        private char[] trackPartsSeparator = { '|' };
 
         #endregion Поля
 
@@ -85,6 +86,8 @@ namespace Yandex.Dj.Services.Bot
             {
                 commandList = JsonConvert.DeserializeObject<List<string>>(settings["commands"].ToString());
                 SoundTimeout = Convert.ToInt32(settings["soundTimeout"].ToString());
+                if (!settings["separators"].IsNullOrEmpty())
+                    trackPartsSeparator = settings["separators"].Select(t => t.ToString()[0]).ToArray();
             }
 
             // Загрузка звуковых команд
@@ -120,6 +123,8 @@ namespace Yandex.Dj.Services.Bot
 
         public BotMessage ProcessCommand(string user, string message)
         {
+            message = message.Trim();
+
             if (message.StartsWith("!"))
             {
                 string command = message.GetMatches(@"^!\w+").First();
@@ -160,7 +165,7 @@ namespace Yandex.Dj.Services.Bot
 
                     case "!sr":
                     case "!заказ":
-                        List<string> parts = data.Split("|")
+                        List<string> parts = data.Split(trackPartsSeparator)
                             .Select(p => p.Trim())
                             .ToList();
 
