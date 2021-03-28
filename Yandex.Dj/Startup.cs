@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 using Yandex.Dj.Services;
 using Yandex.Dj.Services.Bot;
+using Yandex.Dj.Services.Rocksmith;
 using Yandex.Dj.Services.SocketHandler;
 
 namespace Yandex.Dj
@@ -31,6 +32,7 @@ namespace Yandex.Dj
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
+            services.AddSingleton(typeof(RocksmithService));
             services.AddSingleton(typeof(BotService));
             services.AddSingleton(typeof(StreamingService));
 

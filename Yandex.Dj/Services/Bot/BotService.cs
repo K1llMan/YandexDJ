@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Yandex.Dj.Extensions;
+using Yandex.Dj.Services.Rocksmith;
 
 namespace Yandex.Dj.Services.Bot
 {
@@ -24,7 +25,6 @@ namespace Yandex.Dj.Services.Bot
         private Dictionary<string, string> soundCommandList;
 
         private DateTime lastSound = DateTime.Now;
-        private char[] trackPartsSeparator = { '|' };
 
         #endregion Поля
 
@@ -48,16 +48,6 @@ namespace Yandex.Dj.Services.Bot
         public delegate void SoundMessageHandler(SoundMessageEventArgs e);
         public event SoundMessageHandler SoundMessageEvent;
 
-        // Событие добавления/удаления трека
-        public class TrackEventArgs {
-            public RocksmithTrack Track { get; internal set; }
-        }
-
-        public delegate void TrackHandler(TrackEventArgs e);
-        public event TrackHandler TrackAddEvent;
-
-        public event TrackHandler TrackRemoveEvent;
-
         #endregion События
 
         #region Свойства
@@ -68,9 +58,9 @@ namespace Yandex.Dj.Services.Bot
         public int SoundTimeout { get; private set; }
 
         /// <summary>
-        /// Список треков
+        /// Сервис Rocksmith
         /// </summary>
-        public List<RocksmithTrack> TrackList { get; private set; }
+        public RocksmithService Rocksmith { get; private set; }
 
         #endregion Свойства
 
@@ -86,8 +76,6 @@ namespace Yandex.Dj.Services.Bot
             {
                 commandList = JsonConvert.DeserializeObject<List<string>>(settings["commands"].ToString());
                 SoundTimeout = Convert.ToInt32(settings["soundTimeout"].ToString());
-                if (!settings["separators"].IsNullOrEmpty())
-                    trackPartsSeparator = settings["separators"].Select(t => t.ToString()[0]).ToArray();
             }
 
             // Загрузка звуковых команд
@@ -165,31 +153,11 @@ namespace Yandex.Dj.Services.Bot
 
                     case "!sr":
                     case "!заказ":
-                        List<string> parts = data.Split(trackPartsSeparator)
-                            .Select(p => p.Trim())
-                            .ToList();
-
-                        for (int i = 0; i < 4 - parts.Count; i++) 
-                            parts.Add("Any");
-
-                        Enum.TryParse(parts[2], out RocksmithTrackArrangement arrangement);
-
-                        RocksmithTrack track = new() {
-                            Artist = parts[0],
-                            Name = parts[1],
-                            User = user,
-                            ArrangementType = arrangement
-                        };
-
-                        TrackList.Add(track);
-
-                        TrackAddEvent?.Invoke(new TrackEventArgs {
-                            Track = track
-                        });
+                        string result = Rocksmith.AddTrack(data, user);
 
                         return new BotMessage {
                             Type = BotMessageType.Success,
-                            Text = "Трек добавлен"
+                            Text = result
                         };
 
                     default:
@@ -246,18 +214,6 @@ namespace Yandex.Dj.Services.Bot
             return new FileStream(soundCommandList[id], FileMode.Open);
         }
 
-        public void RemoveTrack(RocksmithTrack track)
-        {
-            if (!TrackList.Contains(track))
-                return;
-
-            TrackList.Remove(track);
-
-            TrackRemoveEvent?.Invoke(new TrackEventArgs {
-                Track = track
-            });
-        }
-
         /// <summary>
         /// Тестирование команд бота
         /// </summary>
@@ -266,7 +222,7 @@ namespace Yandex.Dj.Services.Bot
             return ProcessCommand(user, message);
         }
 
-        public BotService()
+        public BotService(RocksmithService rocksmith)
         {
             botDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bot"));
             speechDir = new DirectoryInfo(Path.Combine(botDir.FullName, "speech"));
@@ -278,7 +234,7 @@ namespace Yandex.Dj.Services.Bot
                 speechDirCache.Refresh();
             }
 
-            TrackList = new List<RocksmithTrack>();
+            Rocksmith = rocksmith;
 
             Init();
         }

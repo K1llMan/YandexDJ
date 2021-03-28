@@ -70,7 +70,7 @@ namespace Yandex.Dj.Services.Twitch
                     break;
 
                 case { Type: BotMessageType.Success } when !string.IsNullOrEmpty(message.Text) :
-                    //Send(message.Text);
+                    Send(message.Text);
                     break;
             };
         }

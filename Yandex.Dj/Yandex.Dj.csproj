@@ -35,6 +35,10 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <TestData Remove="test_data\rocksmith\rocksmith.json" />
+  </ItemGroup>
+	
+  <ItemGroup>
     <ProjectReference Include="..\..\Yandex.Music.Api\Yandex.Music.Client\Yandex.Music.Client.csproj" />
   </ItemGroup>
 

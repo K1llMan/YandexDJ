@@ -10,6 +10,7 @@ using Yandex.Dj.Extensions;
 using Yandex.Dj.Services;
 using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.ContentProviders.Common;
+using Yandex.Dj.Services.Rocksmith;
 using Yandex.Dj.Services.Widgets;
 
 namespace Yandex.Dj.Controllers
@@ -96,14 +97,14 @@ namespace Yandex.Dj.Controllers
         [Description("Список треков в очереди")]
         public List<RocksmithTrack> GetTrackList()
         {
-            return streamingService.Bot.TrackList;
+            return streamingService.Rocksmith.TrackList;
         }
 
         [HttpPost("removeTrack")]
         [Description("Удаление трека из очереди")]
         public NoContentResult RemoveTrack([FromBody]RocksmithTrack track)
         {
-            streamingService.Bot.RemoveTrack(track);
+            streamingService.Rocksmith.RemoveTrack(track);
 
             return NoContent();
         }

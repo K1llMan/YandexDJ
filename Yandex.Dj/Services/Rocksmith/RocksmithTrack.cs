@@ -1,12 +1,16 @@
 ﻿using System;
 
-namespace Yandex.Dj.Services.Bot
+using Yandex.Dj.Services.Bot;
+
+namespace Yandex.Dj.Services.Rocksmith
 {
     /// <summary>
     /// Описание трека заказа
     /// </summary>
     public class RocksmithTrack: IEquatable<RocksmithTrack>
     {
+        public string Key { get; set; }
+
         public string Artist { get; set; }
 
         public string Name { get; set; }
@@ -21,7 +25,7 @@ namespace Yandex.Dj.Services.Bot
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Artist == other.Artist && Name == other.Name && User == other.User && ArrangementType == other.ArrangementType;
+            return Key == other.Key;
         }
 
         public override bool Equals(object obj)
@@ -34,7 +38,7 @@ namespace Yandex.Dj.Services.Bot
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Artist, Name, User, (int) ArrangementType);
+            return HashCode.Combine(Key);
         }
 
         #endregion IEquatable

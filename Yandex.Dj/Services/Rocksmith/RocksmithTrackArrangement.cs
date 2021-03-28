@@ -1,4 +1,4 @@
-﻿namespace Yandex.Dj.Services.Bot
+﻿namespace Yandex.Dj.Services.Rocksmith
 {
     /// <summary>
     /// Тип дорожки

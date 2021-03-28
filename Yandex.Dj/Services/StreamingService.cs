@@ -11,6 +11,7 @@ using Yandex.Dj.Extensions;
 using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.ContentProviders;
 using Yandex.Dj.Services.ContentProviders.Common;
+using Yandex.Dj.Services.Rocksmith;
 using Yandex.Dj.Services.Twitch;
 using Yandex.Dj.Services.Widgets;
 
@@ -60,6 +61,11 @@ namespace Yandex.Dj.Services
         /// Бот
         /// </summary>
         public BotService Bot { get; set; }
+
+        /// <summary>
+        /// Rocksmith
+        /// </summary>
+        public RocksmithService Rocksmith { get; set; }
 
         /// <summary>
         /// Управление Twitch
@@ -238,14 +244,15 @@ namespace Yandex.Dj.Services
                 });
             };
 
-            Bot.TrackAddEvent += async eventArgs => {
+            // События Rocksmith
+            Rocksmith.TrackAddEvent += async eventArgs => {
                 await Broadcast.Send(new BroadcastEvent {
                     Event = "addRocksmithTrack",
                     Data = eventArgs.Track
                 });
             };
 
-            Bot.TrackRemoveEvent += async eventArgs => {
+            Rocksmith.TrackRemoveEvent += async eventArgs => {
                 await Broadcast.Send(new BroadcastEvent {
                     Event = "removeRocksmithTrack",
                     Data = eventArgs.Track
@@ -271,20 +278,20 @@ namespace Yandex.Dj.Services
             });
 
             Broadcast.On("getRocksmithTracks", async (wrapper, o) => {
-                await wrapper.Send(serializeMessage(new BroadcastEvent
-                {
+                await wrapper.Send(serializeMessage(new BroadcastEvent {
                     Event = "updateRocksmithTracks",
-                    Data = Bot.TrackList
+                    Data = Rocksmith.TrackList
                 }));
             });
         }
 
         #endregion Обработчики сокетов
 
-        public StreamingService(BotService bot)
+        public StreamingService(BotService bot, RocksmithService rocksmith)
         {
             // Бот
             Bot = bot;
+            Rocksmith = rocksmith;
 
             // Настройки приложения
             JObject settings = JsonCommon.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json"));
