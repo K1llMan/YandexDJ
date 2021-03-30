@@ -17,7 +17,7 @@ namespace Yandex.Dj.Services.Rocksmith
 
         public string User { get; set; }
 
-        public RocksmithTrackArrangement ArrangementType { get; set; }
+        public string ArrangementType { get; set; }
 
         #region IEquatable
 

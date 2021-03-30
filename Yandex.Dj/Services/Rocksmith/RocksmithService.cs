@@ -82,15 +82,13 @@ namespace Yandex.Dj.Services.Rocksmith
             for (int i = 0; i < 4 - parts.Count; i++)
                 parts.Add("Any");
 
-            Enum.TryParse(parts[2], out RocksmithTrackArrangement arrangement);
-
             RocksmithTrack track = new() {
                 // Ключ для добавления/удаления
                 Key = new Guid(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(DateTime.Now.ToString()))).ToString(),
                 Artist = parts[0],
                 Name = parts[1],
                 User = user,
-                ArrangementType = arrangement
+                ArrangementType = parts[2]
             };
 
             // Если список треков от пользователя достиг лимита, то добавляем в отложенную очередь
