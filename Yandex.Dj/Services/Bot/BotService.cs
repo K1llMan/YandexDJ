@@ -53,6 +53,11 @@ namespace Yandex.Dj.Services.Bot
         #region Свойства
 
         /// <summary>
+        /// Флаг логирования сообщений
+        /// </summary>
+        public bool LogMessages { get; private set; }
+
+        /// <summary>
         /// Таймаут звука
         /// </summary>
         public int SoundTimeout { get; private set; }
@@ -72,8 +77,8 @@ namespace Yandex.Dj.Services.Bot
             commandList = new List<string>();
 
             JObject settings = JsonCommon.Load(Path.Combine(botDir.FullName, "bot.json"));
-            if (!settings.IsNullOrEmpty())
-            {
+            if (!settings.IsNullOrEmpty()) {
+                LogMessages = Convert.ToBoolean(settings["logMessages"]);
                 commandList = JsonConvert.DeserializeObject<List<string>>(settings["commands"].ToString());
                 SoundTimeout = Convert.ToInt32(settings["soundTimeout"].ToString());
             }
@@ -112,6 +117,8 @@ namespace Yandex.Dj.Services.Bot
         public BotMessage ProcessCommand(string user, string message)
         {
             message = message.Trim();
+            if (LogMessages)
+                Console.WriteLine($"{user}: {message}");
 
             if (message.StartsWith("!"))
             {

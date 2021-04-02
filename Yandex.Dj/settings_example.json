@@ -1,10 +1,16 @@
 {
 	"scheme": "",
-	"twitch": {
-		"login": "",
-		"clientId": "",
-		"token": "",
-		"channel": ""
+	"streaming": {
+		"twitch": {
+			"login": "",
+			"clientId": "",
+			"token": "",
+			"channel": ""
+		},
+		"youtube": {
+			"apiKey": "",
+			"channelId": ""
+		}
 	},
 	"providers": {
         "yandex": {

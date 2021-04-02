@@ -1,4 +1,5 @@
 ﻿{
+	"logMessages": true,
 	"soundTimeout": 10,
 	"commands": [
 		"!озвучить", "!привет", "!time", "!sr", "!заказ"

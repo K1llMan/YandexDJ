@@ -11,10 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis" Version="1.51.0" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.51.0.2238" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.5" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.5" />
-    <PackageReference Include="TwitchLib" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.13" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.4" />
+    <PackageReference Include="TwitchLib" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +42,12 @@
 	
   <ItemGroup>
     <ProjectReference Include="..\..\Yandex.Music.Api\Yandex.Music.Client\Yandex.Music.Client.csproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Content Update="test_data\rocksmith\rocksmith.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="AfterBuild">

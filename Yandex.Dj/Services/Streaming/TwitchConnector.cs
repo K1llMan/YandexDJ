@@ -14,7 +14,7 @@ using TwitchLib.Communication.Models;
 
 using Yandex.Dj.Services.Bot;
 
-namespace Yandex.Dj.Services.Twitch
+namespace Yandex.Dj.Services.Streaming
 {
     public class TwitchConnector
     {

@@ -12,12 +12,12 @@ using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.ContentProviders;
 using Yandex.Dj.Services.ContentProviders.Common;
 using Yandex.Dj.Services.Rocksmith;
-using Yandex.Dj.Services.Twitch;
+using Yandex.Dj.Services.Streaming;
 using Yandex.Dj.Services.Widgets;
 
 namespace Yandex.Dj.Services
 {
-    public class StreamingService
+    public class StreamingService: IDisposable
     {
         #region Поля
 
@@ -55,7 +55,7 @@ namespace Yandex.Dj.Services
         /// <summary>
         /// Управление данными через сокеты
         /// </summary>
-        public Broadcast Broadcast { get; private set; }
+        public Broadcast Broadcast { get; }
 
         /// <summary>
         /// Бот
@@ -68,9 +68,14 @@ namespace Yandex.Dj.Services
         public RocksmithService Rocksmith { get; set; }
 
         /// <summary>
+        /// Управление Youtube
+        /// </summary>
+        public YoutubeConnector Youtube { get; }
+
+        /// <summary>
         /// Управление Twitch
         /// </summary>
-        public TwitchConnector Twitch { get; private set; }
+        public TwitchConnector Twitch { get; }
 
         #endregion Свойства
 
@@ -298,7 +303,12 @@ namespace Yandex.Dj.Services
 
             contentProviders = new List<ContentProvider>();
             Broadcast = new Broadcast();
-            Twitch = new TwitchConnector(Bot, (JObject)settings["twitch"]);
+
+            JToken streamingConfigs = settings["streaming"];
+            if (!streamingConfigs.IsNullOrEmpty()) {
+                Twitch = new TwitchConnector(Bot, (JObject)streamingConfigs["twitch"]);
+                Youtube = new YoutubeConnector(bot, (JObject)streamingConfigs["youtube"]);
+            }
 
             InitProviders((JObject)settings["providers"]);
             InitWidgetsSchemes(settings["scheme"].ToString());
@@ -306,5 +316,12 @@ namespace Yandex.Dj.Services
         }
 
         #endregion Основные функции
+
+        public void Dispose()
+        {
+            if (Youtube != null) {
+
+            }
+        }
     }
 }
