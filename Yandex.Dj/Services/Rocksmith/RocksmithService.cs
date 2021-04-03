@@ -4,12 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 using Newtonsoft.Json.Linq;
 
 using Yandex.Dj.Extensions;
-using Yandex.Dj.Services.Bot;
 
 namespace Yandex.Dj.Services.Rocksmith
 {
@@ -19,52 +17,24 @@ namespace Yandex.Dj.Services.Rocksmith
 
         private DirectoryInfo rocksmithDir;
         private char[] trackPartsSeparator = { '|' };
-        private int userLimit = 2;
 
         #endregion Поля
 
         #region Свойства
+        
+        /// <summary>
+        /// Конфигурация
+        /// </summary>
+        public RocksmithConfig Config { get; }
 
         /// <summary>
-        /// Список треков
+        /// Очередь треков
         /// </summary>
-        public List<RocksmithTrack> TrackList { get; }
-
-        /// <summary>
-        /// Список отложенных треков
-        /// </summary>
-        public List<RocksmithTrack> BackList { get; }
-
+        public RocksmithQueue Queue { get; }
 
         #endregion Свойства
 
-        #region События
-
-        // Событие добавления/удаления трека
-        public class TrackEventArgs
-        {
-            public RocksmithTrack Track { get; internal set; }
-        }
-
-        public delegate void TrackHandler(TrackEventArgs e);
-        public event TrackHandler TrackAddEvent;
-
-        public event TrackHandler TrackRemoveEvent;
-
-        #endregion События
-
         #region Вспомогательные функции
-
-        private void Init()
-        {
-            JObject settings = JsonCommon.Load(Path.Combine(rocksmithDir.FullName, "rocksmith.json"));
-            if (!settings.IsNullOrEmpty()) {
-                if (!settings["separators"].IsNullOrEmpty())
-                    trackPartsSeparator = settings["separators"].Select(t => t.ToString()[0]).ToArray();
-                if (!settings["userLimit"].IsNullOrEmpty())
-                    userLimit = Convert.ToInt32(settings["userLimit"].ToString());
-            }
-        }
 
         #endregion Вспомогательные функции
 
@@ -91,23 +61,9 @@ namespace Yandex.Dj.Services.Rocksmith
                 ArrangementType = parts[2]
             };
 
-            // Если список треков от пользователя достиг лимита, то добавляем в отложенную очередь
-            int count = TrackList.Count(t => t.User == user);
-            if (count >= userLimit) {
-                BackList.Add(track);
+            string message = Queue.Add(track);
 
-                int backListCount = BackList.Count(t => t.User == user);
-
-                return $"{user}, трек добавлен в отложенную очередь, {count + backListCount} треков всего";
-            }
-
-            TrackList.Add(track);
-
-            TrackAddEvent?.Invoke(new TrackEventArgs {
-                Track = track
-            });
-
-            return $"{user}, трек добавлен.";
+            return message;
         }
 
         /// <summary>
@@ -115,36 +71,15 @@ namespace Yandex.Dj.Services.Rocksmith
         /// </summary>
         public void RemoveTrack(RocksmithTrack track)
         {
-            if (!TrackList.Contains(track))
-                return;
-
-            TrackList.Remove(track);
-
-            TrackRemoveEvent?.Invoke(new TrackEventArgs {
-                Track = track
-            });
-
-            // После удаления из очереди проверяем треки, которые можно добавить из отложенных
-            RocksmithTrack addTrack = BackList.FirstOrDefault(t => TrackList.Count(tt => tt.User == t.User) < userLimit);
-            if (addTrack != null) {
-                BackList.Remove(addTrack);
-                TrackList.Add(addTrack);
-
-                TrackAddEvent?.Invoke(new TrackEventArgs {
-                    Track = addTrack
-                });
-            }
+            Queue.RemoveTrack(track);
         }
 
         public RocksmithService()
         {
-            TrackList = new List<RocksmithTrack>();
-            // Треки для очереди сверх лимита
-            BackList = new List<RocksmithTrack>();
-
             rocksmithDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "rocksmith"));
 
-            Init();
+            Config = JsonCommon.Load<RocksmithConfig>(Path.Combine(rocksmithDir.FullName, "rocksmith.json"));
+            Queue = new RocksmithQueue(rocksmithDir.FullName, Config.UserLimit);
         }
 
         #endregion Основные функции

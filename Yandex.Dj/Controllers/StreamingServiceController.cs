@@ -97,7 +97,7 @@ namespace Yandex.Dj.Controllers
         [Description("Список треков в очереди")]
         public List<RocksmithTrack> GetTrackList()
         {
-            return streamingService.Rocksmith.TrackList;
+            return streamingService.Rocksmith.Queue.Tracks;
         }
 
         [HttpPost("removeTrack")]

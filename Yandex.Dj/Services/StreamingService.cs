@@ -13,6 +13,8 @@ using Yandex.Dj.Services.ContentProviders;
 using Yandex.Dj.Services.ContentProviders.Common;
 using Yandex.Dj.Services.Rocksmith;
 using Yandex.Dj.Services.Streaming;
+using Yandex.Dj.Services.Streaming.Twitch;
+using Yandex.Dj.Services.Streaming.Youtube;
 using Yandex.Dj.Services.Widgets;
 
 namespace Yandex.Dj.Services
@@ -250,14 +252,14 @@ namespace Yandex.Dj.Services
             };
 
             // События Rocksmith
-            Rocksmith.TrackAddEvent += async eventArgs => {
+            Rocksmith.Queue.TrackAddEvent += async eventArgs => {
                 await Broadcast.Send(new BroadcastEvent {
                     Event = "addRocksmithTrack",
                     Data = eventArgs.Track
                 });
             };
 
-            Rocksmith.TrackRemoveEvent += async eventArgs => {
+            Rocksmith.Queue.TrackRemoveEvent += async eventArgs => {
                 await Broadcast.Send(new BroadcastEvent {
                     Event = "removeRocksmithTrack",
                     Data = eventArgs.Track
@@ -285,7 +287,7 @@ namespace Yandex.Dj.Services
             Broadcast.On("getRocksmithTracks", async (wrapper, o) => {
                 await wrapper.Send(serializeMessage(new BroadcastEvent {
                     Event = "updateRocksmithTracks",
-                    Data = Rocksmith.TrackList
+                    Data = Rocksmith.Queue.Tracks
                 }));
             });
         }
@@ -306,8 +308,10 @@ namespace Yandex.Dj.Services
 
             JToken streamingConfigs = settings["streaming"];
             if (!streamingConfigs.IsNullOrEmpty()) {
-                Twitch = new TwitchConnector(Bot, (JObject)streamingConfigs["twitch"]);
-                Youtube = new YoutubeConnector(bot, (JObject)streamingConfigs["youtube"]);
+                if (!streamingConfigs["twitch"].IsNullOrEmpty())
+                    Twitch = new TwitchConnector(Bot, JsonConvert.DeserializeObject<TwitchConnectorConfig>(streamingConfigs["twitch"].ToString()));
+                if (!streamingConfigs["youtube"].IsNullOrEmpty())
+                    Youtube = new YoutubeConnector(Bot, JsonConvert.DeserializeObject<YoutubeConnectorConfig>(streamingConfigs["youtube"].ToString()));
             }
 
             InitProviders((JObject)settings["providers"]);

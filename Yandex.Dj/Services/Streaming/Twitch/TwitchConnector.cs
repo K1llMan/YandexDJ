@@ -14,7 +14,7 @@ using TwitchLib.Communication.Models;
 
 using Yandex.Dj.Services.Bot;
 
-namespace Yandex.Dj.Services.Streaming
+namespace Yandex.Dj.Services.Streaming.Twitch
 {
     public class TwitchConnector
     {
@@ -27,6 +27,11 @@ namespace Yandex.Dj.Services.Streaming
         #region Свойства
 
         /// <summary>
+        /// Конфигурация
+        /// </summary>
+        internal TwitchConnectorConfig Config { get; }
+
+        /// <summary>
         /// Бот
         /// </summary>
         public BotService Bot { get; private set; }
@@ -35,11 +40,6 @@ namespace Yandex.Dj.Services.Streaming
         /// API
         /// </summary>
         public TwitchAPI API { get; private set; }
-
-        /// <summary>
-        /// Канал
-        /// </summary>
-        public string Channel { get; private set; }
 
         /// <summary>
         /// Идентификатор пользователя для API
@@ -75,10 +75,10 @@ namespace Yandex.Dj.Services.Streaming
             };
         }
 
-        private void ClientConnect(JObject config)
+        private void ClientConnect()
         {
             // Token сгенерирован twitchtokengenerator
-            ConnectionCredentials credentials = new(config["login"].ToString(), config["token"].ToString());
+            ConnectionCredentials credentials = new(Config.Login, Config.Token);
             ClientOptions clientOptions = new() {
                 MessagesAllowedInPeriod = 750,
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
@@ -86,7 +86,7 @@ namespace Yandex.Dj.Services.Streaming
 
             WebSocketClient customClient = new(clientOptions);
             client = new TwitchClient(customClient);
-            client.Initialize(credentials, Channel);
+            client.Initialize(credentials, Config.Channel);
 
             //client.OnLog += Client_OnLog;
             client.OnConnected += Client_OnConnected;
@@ -104,16 +104,15 @@ namespace Yandex.Dj.Services.Streaming
             client.Connect();
         }
 
-        private void APIConnect(JObject config)
+        private void APIConnect()
         {
-            API = new TwitchAPI(settings: new ApiSettings
-            {
-                ClientId = config["clientId"].ToString(),
-                AccessToken = config["token"].ToString()
+            API = new TwitchAPI(settings: new ApiSettings {
+                ClientId = Config.ClientId,
+                AccessToken = Config.Token
             });
 
 
-            User[] users = API.V5.Users.GetUserByNameAsync(Channel).GetAwaiter().GetResult().Matches;
+            User[] users = API.V5.Users.GetUserByNameAsync(Config.Channel).GetAwaiter().GetResult().Matches;
             if (users.Length > 0)
                 UserID = users.First().Id;
         }
@@ -124,16 +123,16 @@ namespace Yandex.Dj.Services.Streaming
 
         public void Send(string message)
         {
-            client.SendMessage(Channel, message);
+            client.SendMessage(Config.Channel, message);
         }
 
-        public TwitchConnector(BotService bot, JObject config)
+        public TwitchConnector(BotService bot, TwitchConnectorConfig config)
         {
             Bot = bot;
-            Channel = config["channel"].ToString();
+            Config = config;
 
-            ClientConnect(config);
-            APIConnect(config);
+            ClientConnect();
+            APIConnect();
         }
 
         #endregion Основные функции
