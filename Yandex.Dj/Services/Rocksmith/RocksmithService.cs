@@ -45,7 +45,7 @@ namespace Yandex.Dj.Services.Rocksmith
         /// </summary>
         public string AddTrack(string data, string user)
         {
-            List<string> parts = data.Split(trackPartsSeparator)
+            List<string> parts = data.Split(Config.Separators, StringSplitOptions.RemoveEmptyEntries)
                 .Select(p => p.Trim())
                 .ToList();
 

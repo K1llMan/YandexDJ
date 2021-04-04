@@ -2,7 +2,7 @@
 {
     public class RocksmithConfig
     {
-        public char[] Separators { get; set; }
+        public string[] Separators { get; set; }
         public int UserLimit { get; set; }
     }
 }
