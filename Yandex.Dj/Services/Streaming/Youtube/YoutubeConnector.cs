@@ -79,7 +79,7 @@ namespace Yandex.Dj.Services.Streaming.Youtube
                 };
             }
 
-            await Task.Delay((int) chatResponse.PollingIntervalMillis);
+            await Task.Delay(Math.Max(Config.Interval, (int)chatResponse.PollingIntervalMillis));
 
             return chatResponse.NextPageToken;
         }

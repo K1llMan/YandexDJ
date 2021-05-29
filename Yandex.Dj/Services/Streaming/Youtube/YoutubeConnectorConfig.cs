@@ -5,5 +5,7 @@
         public string ApiKey { get; set; }
 
         public string ChannelId { get; set; }
+
+        public int Interval { get; set; }
     }
 }

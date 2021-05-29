@@ -9,7 +9,8 @@
 		},
 		"youtube": {
 			"apiKey": "",
-			"channelId": ""
+			"channelId": "",
+			"interval": "15000"
 		}
 	},
 	"providers": {

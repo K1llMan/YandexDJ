@@ -122,10 +122,10 @@ namespace Yandex.Dj.Services.Bot
 
             if (message.StartsWith("!"))
             {
-                string command = message.GetMatches(@"^!\w+").First();
+                string command = message.GetMatches(@"^!\w+").FirstOrDefault();
                 string data = message.GetMatches(@"(?<=\b[\s]).+").FirstOrDefault();
 
-                if (!commandList.Contains(command) && !soundCommandList.ContainsKey(command.TrimStart('!')))
+                if (string.IsNullOrEmpty(command?.TrimStart('!')) || !commandList.Contains(command) && !soundCommandList.ContainsKey(command?.TrimStart('!')))
                     return new BotMessage {
                         Type = BotMessageType.NotCommand
                     };
