@@ -7,7 +7,7 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 
-using Yandex.Dj.Services.Bot;
+using Yandex.Dj.Bot;
 
 namespace Yandex.Dj.Services.Streaming.Youtube
 {

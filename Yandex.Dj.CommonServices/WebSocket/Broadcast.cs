@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-using Yandex.Dj.Services.SocketHandler;
-
 using JsonConverter = Newtonsoft.Json.JsonConverter;
 
-namespace Yandex.Dj.Services
+namespace Yandex.Dj.CommonServices.WebSocket
 {
     /// <summary>
     /// Событие рассылки
@@ -31,7 +28,7 @@ namespace Yandex.Dj.Services
     {
         #region Поля
 
-        private JsonSerializerSettings jsonSettings = new() {
+        private static JsonSerializerSettings jsonSettings = new() {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             Converters = new List<JsonConverter> {
                 new StringEnumConverter()
@@ -59,13 +56,21 @@ namespace Yandex.Dj.Services
         #endregion Подписка на события
 
         /// <summary>
+        /// Сериализация передаваемых данных
+        /// </summary>
+        public static string SerializeMessage(object data)
+        {
+            return JsonConvert.SerializeObject(data, Formatting.None, jsonSettings);
+        }
+
+        /// <summary>
         /// Рассылка данных всем клиентам
         /// </summary>
         public async Task Send(params BroadcastEvent[] actions)
         {
             foreach (BroadcastEvent action in actions)
             {
-                string dataStr = JsonConvert.SerializeObject(action, Formatting.None, jsonSettings);
+                string dataStr = SerializeMessage(action);
                 Console.Write(dataStr);
 
                 foreach (WebSocketWrapper socket in sockets.Values)
@@ -94,7 +99,7 @@ namespace Yandex.Dj.Services
         /// <summary>
         /// Добавление нового подключения
         /// </summary>
-        public WebSocketWrapper Add(WebSocket socket)
+        public WebSocketWrapper Add(System.Net.WebSockets.WebSocket socket)
         {
             WebSocketWrapper webSocketWrapper = new(socket);
 

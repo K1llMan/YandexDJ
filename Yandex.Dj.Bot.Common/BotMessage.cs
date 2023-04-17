@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Yandex.Dj.Services.Bot
+namespace Yandex.Dj.Bot
 {
     public class BotMessage
     {

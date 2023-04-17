@@ -63,7 +63,7 @@ namespace Yandex.Dj.Services.ContentProviders.Common
         /// <summary>
         /// Получить содержимое трекп
         /// </summary>
-        public virtual FileStream GetTrackContent(string id)
+        public virtual Stream GetTrackContent(string id)
         {
             return null;
         }

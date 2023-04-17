@@ -7,12 +7,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
+using Yandex.Dj.Bot;
+using Yandex.Dj.CommonServices.WebSocket;
 using Yandex.Dj.Extensions;
-using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.ContentProviders;
 using Yandex.Dj.Services.ContentProviders.Common;
 using Yandex.Dj.Services.Rocksmith;
-using Yandex.Dj.Services.Streaming;
 using Yandex.Dj.Services.Streaming.Twitch;
 using Yandex.Dj.Services.Streaming.Youtube;
 using Yandex.Dj.Services.Widgets;
@@ -67,7 +67,7 @@ namespace Yandex.Dj.Services
         /// <summary>
         /// Rocksmith
         /// </summary>
-        public RocksmithService Rocksmith { get; set; }
+        //public RocksmithService Rocksmith { get; set; }
 
         /// <summary>
         /// Управление Youtube
@@ -207,7 +207,7 @@ namespace Yandex.Dj.Services
             return provider?.GetTrackCover(id);
         }
 
-        public FileStream GetTrackContent(ProviderType type, string id)
+        public Stream GetTrackContent(ProviderType type, string id)
         {
             ContentProvider provider = contentProviders.FirstOrDefault(p => p.Type == type);
 
@@ -251,60 +251,35 @@ namespace Yandex.Dj.Services
                 });
             };
 
-            // События Rocksmith
-            Rocksmith.Queue.TrackAddEvent += async eventArgs => {
-                await Broadcast.Send(new BroadcastEvent {
-                    Event = "addRocksmithTrack",
-                    Data = eventArgs.Track
-                });
-            };
-
-            Rocksmith.Queue.TrackRemoveEvent += async eventArgs => {
-                await Broadcast.Send(new BroadcastEvent {
-                    Event = "removeRocksmithTrack",
-                    Data = eventArgs.Track
-                });
-            };
-
             // Подписка на события
-            Func<object, string> serializeMessage = o => JsonConvert.SerializeObject(o, Formatting.None,
-                new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
 
             Broadcast.On("getCurrentSong", async (wrapper, o) => {
-                await wrapper.Send(serializeMessage(new BroadcastEvent {
+                await wrapper.Send(Broadcast.SerializeMessage(new BroadcastEvent {
                     Event = "updateSong",
                     Data = CurrentTrack
                 }));
             });
 
             Broadcast.On("getCurrentScheme", async (wrapper, o) => {
-                await wrapper.Send(serializeMessage(new BroadcastEvent {
+                await wrapper.Send(Broadcast.SerializeMessage(new BroadcastEvent {
                     Event = "updateScheme",
                     Data = WidgetsScheme
-                }));
-            });
-
-            Broadcast.On("getRocksmithTracks", async (wrapper, o) => {
-                await wrapper.Send(serializeMessage(new BroadcastEvent {
-                    Event = "updateRocksmithTracks",
-                    Data = Rocksmith.Queue.Tracks
                 }));
             });
         }
 
         #endregion Обработчики сокетов
 
-        public StreamingService(BotService bot, RocksmithService rocksmith)
+        public StreamingService(BotService bot, Broadcast broadcast)
         {
             // Бот
             Bot = bot;
-            Rocksmith = rocksmith;
 
             // Настройки приложения
             JObject settings = JsonCommon.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json"));
 
             contentProviders = new List<ContentProvider>();
-            Broadcast = new Broadcast();
+            Broadcast = broadcast;
 
             JToken streamingConfigs = settings["streaming"];
             if (!streamingConfigs.IsNullOrEmpty()) {

@@ -12,7 +12,7 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 
-using Yandex.Dj.Services.Bot;
+using Yandex.Dj.Bot;
 
 namespace Yandex.Dj.Services.Streaming.Twitch
 {

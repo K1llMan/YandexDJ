@@ -1,13 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29911.84
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Dj", "Yandex.Dj\Yandex.Dj.csproj", "{441F057E-FF33-4CA2-BBC9-2C3F54C8736D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Music.Client", "..\Yandex.Music.Api\Yandex.Music.Client\Yandex.Music.Client.csproj", "{78265A7A-704F-4D62-ACD2-1AAA80CA9CA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Dj.Bot.Plugins", "Yandex.Dj.Bot.Plugins\Yandex.Dj.Bot.Plugins.csproj", "{A81F86F9-A965-4B76-8FAC-3C0EDE5D5A75}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Music.Api", "..\Yandex.Music.Api\Yandex.Music.Api\Yandex.Music.Api.csproj", "{1EDE01FA-448E-4D33-A656-A9144791013E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Dj.Bot", "Yandex.Dj.Bot\Yandex.Dj.Bot.csproj", "{231537FC-EF19-451E-B5BE-8A5D7C0B4E6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Dj.Extensions", "Yandex.Dj.Extensions\Yandex.Dj.Extensions.csproj", "{ECDA5971-93ED-4AC1-BB82-B781DA43B915}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{7147BA73-3BAE-4FA6-B659-12AD38432B2D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Dj.Bot.Common", "Yandex.Dj.Bot.Common\Yandex.Dj.Bot.Common.csproj", "{FC4D12BD-24C6-4C8F-97C1-72617B6A1505}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloPlugin", "Plugins\HelloPlugin\HelloPlugin.csproj", "{46C3459A-3A24-42B5-824E-191B4B6EC572}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RocksmithPlugin", "Plugins\RocksmithPlugin\RocksmithPlugin.csproj", "{290FD79C-4E45-4341-A4EE-BAEF8A6E2AE9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Dj.CommonServices", "Yandex.Dj.CommonServices\Yandex.Dj.CommonServices.csproj", "{0B303757-F5B2-489C-9E86-FD25C26809F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,17 +31,41 @@ Global
 		{441F057E-FF33-4CA2-BBC9-2C3F54C8736D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{441F057E-FF33-4CA2-BBC9-2C3F54C8736D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{441F057E-FF33-4CA2-BBC9-2C3F54C8736D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78265A7A-704F-4D62-ACD2-1AAA80CA9CA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78265A7A-704F-4D62-ACD2-1AAA80CA9CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78265A7A-704F-4D62-ACD2-1AAA80CA9CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78265A7A-704F-4D62-ACD2-1AAA80CA9CA9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EDE01FA-448E-4D33-A656-A9144791013E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EDE01FA-448E-4D33-A656-A9144791013E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EDE01FA-448E-4D33-A656-A9144791013E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EDE01FA-448E-4D33-A656-A9144791013E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A81F86F9-A965-4B76-8FAC-3C0EDE5D5A75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A81F86F9-A965-4B76-8FAC-3C0EDE5D5A75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A81F86F9-A965-4B76-8FAC-3C0EDE5D5A75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A81F86F9-A965-4B76-8FAC-3C0EDE5D5A75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{231537FC-EF19-451E-B5BE-8A5D7C0B4E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{231537FC-EF19-451E-B5BE-8A5D7C0B4E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{231537FC-EF19-451E-B5BE-8A5D7C0B4E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{231537FC-EF19-451E-B5BE-8A5D7C0B4E6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECDA5971-93ED-4AC1-BB82-B781DA43B915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECDA5971-93ED-4AC1-BB82-B781DA43B915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECDA5971-93ED-4AC1-BB82-B781DA43B915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECDA5971-93ED-4AC1-BB82-B781DA43B915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC4D12BD-24C6-4C8F-97C1-72617B6A1505}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC4D12BD-24C6-4C8F-97C1-72617B6A1505}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC4D12BD-24C6-4C8F-97C1-72617B6A1505}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC4D12BD-24C6-4C8F-97C1-72617B6A1505}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46C3459A-3A24-42B5-824E-191B4B6EC572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46C3459A-3A24-42B5-824E-191B4B6EC572}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46C3459A-3A24-42B5-824E-191B4B6EC572}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46C3459A-3A24-42B5-824E-191B4B6EC572}.Release|Any CPU.Build.0 = Release|Any CPU
+		{290FD79C-4E45-4341-A4EE-BAEF8A6E2AE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{290FD79C-4E45-4341-A4EE-BAEF8A6E2AE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{290FD79C-4E45-4341-A4EE-BAEF8A6E2AE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{290FD79C-4E45-4341-A4EE-BAEF8A6E2AE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B303757-F5B2-489C-9E86-FD25C26809F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B303757-F5B2-489C-9E86-FD25C26809F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B303757-F5B2-489C-9E86-FD25C26809F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B303757-F5B2-489C-9E86-FD25C26809F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{46C3459A-3A24-42B5-824E-191B4B6EC572} = {7147BA73-3BAE-4FA6-B659-12AD38432B2D}
+		{290FD79C-4E45-4341-A4EE-BAEF8A6E2AE9} = {7147BA73-3BAE-4FA6-B659-12AD38432B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4B9DE19-0B44-48D2-A6FC-E39143751424}

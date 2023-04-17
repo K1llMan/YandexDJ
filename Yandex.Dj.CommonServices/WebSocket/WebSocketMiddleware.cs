@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Net.WebSockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 
-namespace Yandex.Dj.Services.SocketHandler
+namespace Yandex.Dj.CommonServices.WebSocket
 {
     /// <summary>
     /// Класс для обновления данных на всех подключённых клиентах
@@ -25,7 +24,7 @@ namespace Yandex.Dj.Services.SocketHandler
             nextDelegate = next;
         }
 
-        public async Task Invoke(HttpContext context, StreamingService streaming)
+        public async Task Invoke(HttpContext context, Broadcast broadcast)
         {
             if (!pathRegex.IsMatch(context.Request.Path))
             {
@@ -39,8 +38,8 @@ namespace Yandex.Dj.Services.SocketHandler
                 return;
             }
 
-            WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-            WebSocketWrapper socket = streaming.Broadcast.Add(webSocket);
+            System.Net.WebSockets.WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+            WebSocketWrapper socket = broadcast.Add(webSocket);
 
             try
             {

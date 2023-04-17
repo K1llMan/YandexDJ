@@ -39,7 +39,10 @@ namespace Yandex.Dj.Controllers
         [Description("Получение обложки локального плейлиста")]
         public object GetPlaylistCover(string id)
         {
-            return File(streamingService.GetPlaylistCover(id), "image/*");
+            FileStream fs = streamingService.GetPlaylistCover(id);
+            return fs == null 
+                ? null 
+                : File(streamingService.GetPlaylistCover(id), "image/*");
         }
 
         [HttpGet("trackCover")]
@@ -53,7 +56,10 @@ namespace Yandex.Dj.Controllers
         [Description("Получение трека")]
         public object Track(ProviderType type, string id)
         {
-            return File(streamingService.GetTrackContent(type, id), "audio/mpeg");
+            FileStreamResult file = File(streamingService.GetTrackContent(type, id), "audio/mpeg");
+            file.EnableRangeProcessing = true;
+
+            return file;
         }
 
         [HttpGet("speech")]

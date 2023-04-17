@@ -6,10 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Yandex.Dj.Bot;
+using Yandex.Dj.CommonServices.WebSocket;
 using Yandex.Dj.Services;
-using Yandex.Dj.Services.Bot;
 using Yandex.Dj.Services.Rocksmith;
-using Yandex.Dj.Services.SocketHandler;
 
 namespace Yandex.Dj
 {
@@ -33,6 +33,7 @@ namespace Yandex.Dj
             });
 
             services.AddSingleton(typeof(RocksmithService));
+            services.AddSingleton(typeof(Broadcast));
             services.AddSingleton(typeof(BotService));
             services.AddSingleton(typeof(StreamingService));
 

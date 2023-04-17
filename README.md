@@ -10,7 +10,6 @@
 
 ## Запуск в отладке
 Необходимо предварительно добавить следующие проекты:
-- [Yandex.Music API (Unofficial) for .Net Core](https://github.com/K1llMan/Yandex.Music.Api) в ../Yandex.Music.Api
 - [YandexDJ React App](https://github.com/K1llMan/YandexDJReactApp) в ./ClientApp
 
 Затем собрать из ClientApp веб-приложение. После этого в отладке будет доступен интерфейс веб-приложения по локальному адресу, оверлей - по {локальный адрес}/stream.

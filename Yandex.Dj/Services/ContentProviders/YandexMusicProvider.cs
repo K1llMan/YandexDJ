@@ -90,7 +90,7 @@ namespace Yandex.Dj.Services.ContentProviders
                     Artist = t.Track.Artists.Count > 0 ? t.Track.Artists.First().Name : string.Empty,
                     Title = t.Track.Title,
                     Cover = GetCover(t.Track.CoverUri, 100),
-                    Gain = t.Track.Normalization.Gain
+                    Gain = t.Track.Normalization?.Gain ?? 12
                 })
                 .ToArray()
             };
@@ -107,13 +107,13 @@ namespace Yandex.Dj.Services.ContentProviders
             return $"api/content/track?type=yandex&id={name}";
         }
 
-        public override FileStream GetTrackContent(string id)
+        public override Stream GetTrackContent(string id)
         {
             string path = Path.Combine(cacheDir, id);
             if (!File.Exists(path))
                 return null;
 
-            return new FileStream(path, FileMode.Open);
+            return new MemoryStream(File.ReadAllBytes(path));
         }
 
         #endregion Перегружаемые функции

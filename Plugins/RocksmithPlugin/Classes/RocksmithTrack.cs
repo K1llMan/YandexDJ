@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Yandex.Dj.Services.Rocksmith
+namespace RocksmithPlugin.Classes
 {
     /// <summary>
     /// Описание трека заказа

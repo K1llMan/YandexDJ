@@ -152,7 +152,7 @@ namespace Yandex.Dj.Services.ContentProviders
         {
             string path = localPlaylists.FirstOrDefault(p => p.ID == id)?.Cover;
            
-            return string.IsNullOrEmpty(path) 
+            return string.IsNullOrEmpty(path) || !File.Exists(path) 
                 ? null 
                 : new FileStream(path, FileMode.Open);
         }

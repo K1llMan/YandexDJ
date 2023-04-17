@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\Config\Plugins.xml" />
+  <ItemGroup>
+    <None Remove="resources\settings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\settings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Yandex.Dj.Bot.Plugins\Yandex.Dj.Bot.Plugins.csproj" />
+  </ItemGroup>
+
+</Project>

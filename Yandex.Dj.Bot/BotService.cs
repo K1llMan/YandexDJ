@@ -7,10 +7,11 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using Yandex.Dj.Bot.Plugins;
+using Yandex.Dj.CommonServices.WebSocket;
 using Yandex.Dj.Extensions;
-using Yandex.Dj.Services.Rocksmith;
 
-namespace Yandex.Dj.Services.Bot
+namespace Yandex.Dj.Bot
 {
     public class BotService
     {
@@ -18,6 +19,7 @@ namespace Yandex.Dj.Services.Bot
 
         // Директории бота
         private DirectoryInfo botDir;
+        private DirectoryInfo pluginsDir;
         private DirectoryInfo speechDir;
         private DirectoryInfo speechDirCache;
 
@@ -57,6 +59,8 @@ namespace Yandex.Dj.Services.Bot
         /// </summary>
         public bool LogMessages { get; private set; }
 
+        public BotPluginManager Plugins { get; private set; }
+
         /// <summary>
         /// Таймаут звука
         /// </summary>
@@ -65,7 +69,7 @@ namespace Yandex.Dj.Services.Bot
         /// <summary>
         /// Сервис Rocksmith
         /// </summary>
-        public RocksmithService Rocksmith { get; private set; }
+        //public RocksmithService Rocksmith { get; private set; }
 
         #endregion Свойства
 
@@ -120,78 +124,79 @@ namespace Yandex.Dj.Services.Bot
             if (LogMessages)
                 Console.WriteLine($"{user}: {message}");
 
-            if (message.StartsWith("!"))
-            {
-                string command = message.GetMatches(@"^!\w+").FirstOrDefault();
-                string data = message.GetMatches(@"(?<=\b[\s]).+").FirstOrDefault();
+            if (!message.StartsWith("!"))
+                return new BotMessage {
+                    Type = BotMessageType.NotCommand
+                };
 
-                if (string.IsNullOrEmpty(command?.TrimStart('!')) || !commandList.Contains(command) && !soundCommandList.ContainsKey(command?.TrimStart('!')))
+            string command = message.GetMatches(@"^!\w+").FirstOrDefault()?.ToLower();
+            string data = message.GetMatches(@"(?<=\b[\s]).+").FirstOrDefault();
+            
+            return Plugins.ProcessCommand(user, command, data);
+            /*
+            if (string.IsNullOrEmpty(command?.TrimStart('!')) || !commandList.Contains(command) && !soundCommandList.ContainsKey(command?.TrimStart('!')))
+                return new BotMessage {
+                    Type = BotMessageType.NotCommand
+                };
+
+            switch (command)
+            {
+                case "!привет":
                     return new BotMessage {
-                        Type = BotMessageType.NotCommand
+                        Text = $"Привет, {user}!",
+                        Type = BotMessageType.Success
                     };
 
-                switch (command)
-                {
-                    case "!привет":
+                case "!озвучить":
+                    if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
                         return new BotMessage {
-                            Text = $"Привет, {user}!",
-                            Type = BotMessageType.Success
+                            Type = BotMessageType.Error
                         };
 
-                    case "!озвучить":
+                    string id = TextToSpeech(data);
+                    TextToSpeechEvent?.Invoke(new TextToSpeechEventArgs {
+                        FileName = id
+                    });
+
+                    lastSound = DateTime.Now;
+                    break;
+
+                case "!time":
+                    return new BotMessage {
+                        Text = $"Время в эфире: {DateTime.Now}",
+                        Type = BotMessageType.Success
+                    };
+
+                case "!sr":
+                case "!заказ":
+                    string result = Rocksmith.AddTrack(data, user);
+
+                    return new BotMessage {
+                        Type = BotMessageType.Success,
+                        Text = result
+                    };
+
+                default:
+                    if (soundCommandList.ContainsKey(command.TrimStart('!')))
+                    {
                         if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
                             return new BotMessage {
                                 Type = BotMessageType.Error
                             };
 
-                        string id = TextToSpeech(data);
-                        TextToSpeechEvent?.Invoke(new TextToSpeechEventArgs {
-                            FileName = id
+                        SoundMessageEvent?.Invoke(new SoundMessageEventArgs {
+                            FileName = command.TrimStart('!')
                         });
 
                         lastSound = DateTime.Now;
-                        break;
-
-                    case "!time":
-                        return new BotMessage {
-                            Text = $"Время в эфире: {DateTime.Now}",
-                            Type = BotMessageType.Success
-                        };
-
-                    case "!sr":
-                    case "!заказ":
-                        string result = Rocksmith.AddTrack(data, user);
-
-                        return new BotMessage {
-                            Type = BotMessageType.Success,
-                            Text = result
-                        };
-
-                    default:
-                        if (soundCommandList.ContainsKey(command.TrimStart('!')))
-                        {
-                            if (DateTime.Now < lastSound.AddSeconds(SoundTimeout))
-                                return new BotMessage {
-                                    Type = BotMessageType.Error
-                                };
-
-                            SoundMessageEvent?.Invoke(new SoundMessageEventArgs {
-                                FileName = command.TrimStart('!')
-                            });
-
-                            lastSound = DateTime.Now;
-                        }
-                        break;
-                }
-
-                return new BotMessage {
-                    Type = BotMessageType.Success
-                };
+                    }
+                    break;
             }
 
             return new BotMessage {
-                Type = BotMessageType.NotCommand
+                Type = BotMessageType.Success
             };
+            */
         }
 
         #endregion Обработка команд
@@ -229,9 +234,11 @@ namespace Yandex.Dj.Services.Bot
             return ProcessCommand(user, message);
         }
 
-        public BotService(RocksmithService rocksmith)
+        public BotService(Broadcast broadcast)//RocksmithService rocksmith)
         {
             botDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bot"));
+            Plugins = new BotPluginManager(broadcast);
+
             speechDir = new DirectoryInfo(Path.Combine(botDir.FullName, "speech"));
             speechDirCache = new DirectoryInfo(Path.Combine(speechDir.FullName, "cache"));
 
@@ -241,7 +248,7 @@ namespace Yandex.Dj.Services.Bot
                 speechDirCache.Refresh();
             }
 
-            Rocksmith = rocksmith;
+            //Rocksmith = rocksmith;
 
             Init();
         }

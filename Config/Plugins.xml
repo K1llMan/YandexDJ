@@ -1,0 +1,17 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="Common.xml" />
+  
+  <PropertyGroup>
+    <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);$(OutputPath)</AssemblySearchPaths>
+    <OutputPath>..\$(OutputPath)\plugins\$(MSBuildProjectName)</OutputPath>
+    <ReferencePath>..\..\$(OutputPath)</ReferencePath>
+  </PropertyGroup>
+    
+  <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
+    <Message Importance="High" Text="Cleaning references..."/>
+      <ItemGroup>
+        <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"/>
+      </ItemGroup>
+  </Target>
+
+</Project>

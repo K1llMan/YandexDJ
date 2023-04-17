@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Yandex.Dj.Services.SocketHandler
+namespace Yandex.Dj.CommonServices.WebSocket
 {
     /// <summary>
     /// Класс для обновления данных на всех подключённых клиентах
@@ -14,7 +14,7 @@ namespace Yandex.Dj.Services.SocketHandler
     {
         #region Поля
 
-        private WebSocket curSocket;
+        private System.Net.WebSockets.WebSocket curSocket;
 
         // Сообщение
         private StringBuilder data;
@@ -137,7 +137,7 @@ namespace Yandex.Dj.Services.SocketHandler
         /// <summary>
         /// Добавление нового подключения
         /// </summary>
-        public WebSocketWrapper(WebSocket socket, int bufferSize = 4096)
+        public WebSocketWrapper(System.Net.WebSockets.WebSocket socket, int bufferSize = 4096)
         {
             curSocket = socket;
             GUID = Guid.NewGuid().ToString();
